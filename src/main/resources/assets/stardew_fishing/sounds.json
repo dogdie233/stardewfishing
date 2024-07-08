@@ -1,0 +1,30 @@
+{
+  "entity.fishing_bobber.throw": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "stardew_fishing:cast",
+        "volume": 1.5
+      }
+    ]
+  },
+  "entity.fishing_bobber.retrieve": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "stardew_fishing:fish_hit",
+        "volume": 1.5,
+        "pitch": 1.7
+      }
+    ]
+  },
+  "entity.fishing_bobber.splash": {
+    "replace": true,
+    "sounds": [
+      {
+        "name": "stardew_fishing:fish_bite",
+        "volume": 1.5
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "behaviors": {
+    "salmon": {
+      "idle_time": 10,
+      "top_speed": 3,
+      "up_acceleration": 0.2,
+      "down_acceleration": 0.2,
+      "avg_distance": 20,
+      "move_variation": 5
+    }
+  },
+  "defaultBehavior": {
+    "idle_time": 30,
+    "top_speed": 2,
+    "up_acceleration": 0.4,
+    "down_acceleration": 0.4,
+    "avg_distance": 50,
+    "move_variation": 10
+  }
+}
