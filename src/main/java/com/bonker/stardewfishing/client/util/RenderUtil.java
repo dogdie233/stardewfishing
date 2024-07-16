@@ -1,4 +1,4 @@
-package com.bonker.stardewfishing.client;
+package com.bonker.stardewfishing.client.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -76,7 +76,16 @@ public class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static void drawWithShake(PoseStack poseStack, float shakeStrength, float shakeSpeed, Runnable runnable) {
+    public static void drawWithShake(PoseStack poseStack, Shake shake, float partialTick, boolean doShake, Runnable runnable) {
+        if (doShake) {
+            poseStack.pushPose();
+            poseStack.translate(shake.getXOffset(partialTick), shake.getYOffset(partialTick), 0);
+        }
 
+        runnable.run();
+
+        if (doShake) {
+            poseStack.popPose();
+        }
     }
 }

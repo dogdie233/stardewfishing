@@ -1,64 +1,65 @@
 package com.bonker.stardewfishing;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Forge's config APIs
 @Mod.EventBusSubscriber(modid = StardewFishing.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class Config
-{
+public class SFConfig {
+    static final ForgeConfigSpec SERVER_SPEC;
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-    private static final ForgeConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
-            .comment("Whether to log the dirt block on common setup")
-            .define("logDirtBlock", true);
+    private static final ForgeConfigSpec.DoubleValue QUALITY_1_THRESHOLD;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_2_THRESHOLD;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_3_THRESHOLD;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_1_MULTIPLIER;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_2_MULTIPLIER;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_3_MULTIPLIER;
 
-    private static final ForgeConfigSpec.IntValue MAGIC_NUMBER = BUILDER
-            .comment("A magic number")
-            .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
+    static {
+        QUALITY_1_THRESHOLD = BUILDER
+                .comment("The minimum accuracy that grants an item of quality 1.")
+                .defineInRange("quality1Threshold", 0.75, 0, 1);
 
-    public static final ForgeConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER
-            .comment("What you want the introduction message to be for the magic number")
-            .define("magicNumberIntroduction", "The magic number is... ");
+        QUALITY_2_THRESHOLD = BUILDER
+                .comment("The minimum accuracy that grants an item of quality 2.")
+                .defineInRange("quality2Threshold", 0.9, 0, 1);
 
-    // a list of strings that are treated as resource locations for items
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
-            .comment("A list of items to log on common setup.")
-            .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
+        QUALITY_3_THRESHOLD = BUILDER
+                .comment("The minimum accuracy that grants an item of quality 3.")
+                .defineInRange("quality3Threshold", 1.0, 0, 1);
 
-    static final ForgeConfigSpec SPEC = BUILDER.build();
+        QUALITY_1_MULTIPLIER = BUILDER
+                .comment("The multiplier that is applied to experience gained from fishing a quality 1 reward.")
+                .defineInRange("quality1Multiplier", 1.5, 1, 10);
 
-    public static boolean logDirtBlock;
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
-    public static Set<Item> items;
+        QUALITY_2_MULTIPLIER = BUILDER
+                .comment("The multiplier that is applied to experience gained from fishing a quality 2 reward.")
+                .defineInRange("quality2Multiplier", 2.5, 1, 10);
 
-    private static boolean validateItemName(final Object obj)
-    {
-        return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
+        QUALITY_3_MULTIPLIER = BUILDER
+                .comment("The multiplier that is applied to experience gained from fishing a quality 3 reward.")
+                .defineInRange("quality3Multiplier", 4.0, 1, 10);
+
+        SERVER_SPEC = BUILDER.build();
     }
 
-    @SubscribeEvent
-    static void onLoad(final ModConfigEvent event)
-    {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
+    public static int getQuality(double accuracy) {
+        if (accuracy >= SFConfig.QUALITY_3_THRESHOLD.get()) {
+            return 3;
+        } else if (accuracy >= SFConfig.QUALITY_2_THRESHOLD.get()) {
+            return 2;
+        } else if (accuracy >= SFConfig.QUALITY_1_THRESHOLD.get()) {
+            return 1;
+        }
+        return 0;
+    }
 
-        // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream()
-                .map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName)))
-                .collect(Collectors.toSet());
+    public static double getMultiplier(double accuracy) {
+        return switch(getQuality(accuracy)) {
+            case 3 -> QUALITY_3_MULTIPLIER.get();
+            case 2 -> QUALITY_2_MULTIPLIER.get();
+            case 1 -> QUALITY_1_MULTIPLIER.get();
+            default -> 1;
+        };
     }
 }

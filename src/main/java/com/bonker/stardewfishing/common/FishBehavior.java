@@ -1,16 +1,25 @@
 package com.bonker.stardewfishing.common;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 
 import java.util.Random;
 
-public record FishDifficulty(int idleTime, float topSpeed, float upAcceleration, float downAcceleration, int avgDistance, int moveVariation) {
-    public static final FishDifficulty TEST = new FishDifficulty(30, 2, 0.4F, 0.4F, 50, 10);
+public record FishBehavior(int idleTime, float topSpeed, float upAcceleration, float downAcceleration, int avgDistance, int moveVariation) {
+    public static final Codec<FishBehavior> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+            Codec.INT.fieldOf("idle_time").forGetter(FishBehavior::idleTime),
+            Codec.FLOAT.fieldOf("top_speed").forGetter(FishBehavior::topSpeed),
+            Codec.FLOAT.fieldOf("up_acceleration").forGetter(FishBehavior::upAcceleration),
+            Codec.FLOAT.fieldOf("down_acceleration").forGetter(FishBehavior::downAcceleration),
+            Codec.INT.fieldOf("avg_distance").forGetter(FishBehavior::avgDistance),
+            Codec.INT.fieldOf("move_variation").forGetter(FishBehavior::moveVariation)
+    ).apply(inst, FishBehavior::new));
 
     public static final int MAX_HEIGHT = 127;
 
-    public FishDifficulty(FriendlyByteBuf buf) {
+    public FishBehavior(FriendlyByteBuf buf) {
         this(buf.readVarInt(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readVarInt(), buf.readVarInt());
     }
 

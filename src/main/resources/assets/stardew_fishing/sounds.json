@@ -1,30 +1,54 @@
 {
-  "entity.fishing_bobber.throw": {
-    "replace": true,
+  "cast": {
     "sounds": [
-      {
-        "name": "stardew_fishing:cast",
-        "volume": 1.5
-      }
+        "stardew_fishing:cast"
     ]
   },
-  "entity.fishing_bobber.retrieve": {
-    "replace": true,
+  "complete": {
     "sounds": [
-      {
-        "name": "stardew_fishing:fish_hit",
-        "volume": 1.5,
-        "pitch": 1.7
-      }
+      "stardew_fishing:complete"
     ]
   },
-  "entity.fishing_bobber.splash": {
-    "replace": true,
+  "dwop": {
     "sounds": [
-      {
-        "name": "stardew_fishing:fish_bite",
-        "volume": 1.5
-      }
+      "stardew_fishing:dwop"
+    ]
+  },
+  "fish_bite": {
+    "sounds": [
+      "stardew_fishing:fish_bite"
+    ]
+  },
+  "fish_escape": {
+    "sounds": [
+      "stardew_fishing:fish_escape"
+    ]
+  },
+  "fish_hit": {
+    "sounds": [
+        "stardew_fishing:fish_hit"
+    ]
+  },
+  "pull_item": {
+    "sounds": [
+      "stardew_fishing:pull_item"
+    ]
+  },
+  "reel_creak": {
+    "sounds": [
+      "stardew_fishing:reel_creak1",
+      "stardew_fishing:reel_creak2",
+      "stardew_fishing:reel_creak3"
+    ]
+  },
+  "reel_fast": {
+    "sounds": [
+      "stardew_fishing:reel_fast"
+    ]
+  },
+  "reel_slow": {
+    "sounds": [
+      "stardew_fishing:reel_slow"
     ]
   }
 }

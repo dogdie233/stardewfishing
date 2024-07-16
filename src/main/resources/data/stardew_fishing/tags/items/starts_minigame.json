@@ -1,0 +1,9 @@
+{
+  "values": [
+    "#minecraft:fishes",
+    {
+      "id": "aquaculture:jellyfish",
+      "required": false
+    }
+  ]
+}

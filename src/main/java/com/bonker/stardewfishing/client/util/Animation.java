@@ -1,10 +1,11 @@
-package com.bonker.stardewfishing.client;
+package com.bonker.stardewfishing.client.util;
 
 import net.minecraft.util.Mth;
 
 public class Animation {
     private float lastValue;
     private float value;
+    private boolean frozen = false;
 
     public Animation(float value) {
         this.lastValue = value;
@@ -25,10 +26,17 @@ public class Animation {
     }
 
     public float getInterpolated(float partialTick) {
+        if (frozen) return value;
         return Mth.lerp(partialTick, lastValue, value);
     }
 
     public void freeze() {
+        frozen = true;
         lastValue = value;
+    }
+
+    public void reset(float value) {
+        lastValue = value;
+        this.value = value;
     }
 }

@@ -7,6 +7,14 @@
       "down_acceleration": 0.2,
       "avg_distance": 20,
       "move_variation": 5
+    },
+    "aquaculture:jellyfish": {
+      "idle_time": 1,
+      "top_speed": 2,
+      "up_acceleration": 0.1,
+      "down_acceleration": 0.1,
+      "avg_distance": 25,
+      "move_variation": 20
     }
   },
   "defaultBehavior": {
