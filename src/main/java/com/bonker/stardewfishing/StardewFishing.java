@@ -1,12 +1,9 @@
 package com.bonker.stardewfishing;
 
-import com.bonker.stardewfishing.common.StardewFishingHook;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -31,16 +28,6 @@ public class StardewFishing {
     public static final TagKey<Item> STARTS_MINIGAME = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), new ResourceLocation(MODID, "starts_minigame"));
 
     /*
-        Entity Types
-     */
-
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
-
-    public static final RegistryObject<EntityType<StardewFishingHook>> STARDEW_FISHING_HOOK =
-            ENTITY_TYPES.register("stardew_fishing_hook", () -> EntityType.Builder.<StardewFishingHook>of(StardewFishingHook::new, MobCategory.MISC)
-                    .noSave().noSummon().sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(5).build(null));
-
-    /*
         Sound Events
      */
 
@@ -60,7 +47,6 @@ public class StardewFishing {
     public StardewFishing() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ENTITY_TYPES.register(bus);
         SOUND_EVENTS.register(bus);
 
         SFNetworking.register();

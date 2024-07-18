@@ -1,6 +1,6 @@
 package com.bonker.stardewfishing.common.networking;
 
-import com.bonker.stardewfishing.common.StardewFishingHook;
+import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,19 +31,19 @@ public record C2SCompleteMinigamePacket(boolean success, double accuracy) {
         }
 
         FishingHook hook = player.fishing;
-        if (!(hook instanceof StardewFishingHook stardewHook)) {
+        if (hook == null || FishingHookLogic.getStoredRewards(hook).isEmpty()) {
             LOGGER.warn("{} tried to complete a fishing minigame that doesn't exist", player.getScoreboardName());
             return;
         }
 
         contextSupplier.get().enqueueWork(() -> {
-            InteractionHand hand = StardewFishingHook.getRodHand(player);
+            InteractionHand hand = FishingHookLogic.getRodHand(player);
             if (hand == null) {
-                stardewHook.endMinigame(player, false, accuracy);
+                FishingHookLogic.endMinigame(player, false, 0);
                 LOGGER.warn("{} tried to complete a fishing minigame without a fishing rod", player.getScoreboardName());
             } else {
-                int damage = stardewHook.endMinigame(player, success, accuracy);
-                player.getItemInHand(hand).hurtAndBreak(damage, player, p -> p.broadcastBreakEvent(hand));
+                FishingHookLogic.endMinigame(player, success, accuracy);
+                player.getItemInHand(hand).hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
             }
         });
     }

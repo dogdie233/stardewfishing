@@ -3,13 +3,11 @@ package com.bonker.stardewfishing.client;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishBehavior;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.FishingHookRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.sound.PlaySoundSourceEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -59,11 +57,6 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onRegisterGuiOverlays(final RegisterGuiOverlaysEvent event) {
             event.registerAboveAll(StardewFishing.MODID, FishingOverlay.OVERLAY);
-        }
-
-        @SubscribeEvent
-        public static void onRegisterEntityRenderers(final EntityRenderersEvent.RegisterRenderers event) {
-            event.registerEntityRenderer(StardewFishing.STARDEW_FISHING_HOOK.get(), FishingHookRenderer::new);
         }
     }
 }
