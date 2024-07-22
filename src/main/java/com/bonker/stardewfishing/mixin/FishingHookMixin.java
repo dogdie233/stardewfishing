@@ -3,6 +3,7 @@ package com.bonker.stardewfishing.mixin;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -19,7 +20,7 @@ import java.util.List;
 @Mixin(value = FishingHook.class)
 public abstract class FishingHookMixin {
     @Inject(method = "catchingFish", at = @At(value = "HEAD"), cancellable = true)
-    private void catchingFish(BlockPos pPos, CallbackInfo ci) {
+    private void cancel_catchingFish(BlockPos pPos, CallbackInfo ci) {
         FishingHook hook = (FishingHook) (Object) this;
 
         if (FishingHookLogic.getStoredRewards(hook).isEmpty()) {
@@ -29,9 +30,7 @@ public abstract class FishingHookMixin {
 
     @Inject(method = "retrieve",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/advancements/critereon/FishingRodHookedTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/projectile/FishingHook;Ljava/util/Collection;)V",
-                    shift = At.Shift.AFTER,
-                    ordinal = 1),
+                    target = "Lnet/minecraftforge/eventbus/api/IEventBus;post(Lnet/minecraftforge/eventbus/api/Event;)Z"),
             cancellable = true)
     public void retrieve(ItemStack pStack, CallbackInfoReturnable<Integer> cir, @Local List<ItemStack> items) {
         FishingHook hook = (FishingHook) (Object) this;
@@ -39,6 +38,7 @@ public abstract class FishingHookMixin {
         if (player == null) return;
 
         if (items.stream().anyMatch(stack -> stack.is(StardewFishing.STARTS_MINIGAME))) {
+            CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, pStack, hook, items);
             FishingHookLogic.getStoredRewards(hook).ifPresent(rewards -> rewards.addAll(items));
             FishingHookLogic.startMinigame(player);
             cir.cancel();

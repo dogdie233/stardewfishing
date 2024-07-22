@@ -15,7 +15,7 @@ public class CommonEvents {
     @Mod.EventBusSubscriber(modid = StardewFishing.MODID)
     public static class ForgeBus {
         @SubscribeEvent
-        public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
+        public static void onAttachCapabilitiesPlayer(final AttachCapabilitiesEvent<Entity> event) {
             if (event.getObject() instanceof FishingHook) {
                 FishingHookLogic.attachCap(event);
             }

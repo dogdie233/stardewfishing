@@ -19,6 +19,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -26,6 +27,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,6 +106,15 @@ public class FishingHookLogic {
 
         FishingHook hook = player.fishing;
         getStoredRewards(hook).ifPresent(rewards -> {
+            ItemFishedEvent event = new ItemFishedEvent(rewards, hook.onGround() ? 2 : 1, hook);
+            MinecraftForge.EVENT_BUS.post(event);
+            if (event.isCanceled()) {
+                hook.discard();
+                return;
+            }
+
+            player.getItemInHand(hand).hurtAndBreak(event.getRodDamage(), player, p -> p.broadcastBreakEvent(hand));
+
             ServerLevel level = player.serverLevel();
             for (ItemStack reward : rewards) {
                 ItemEntity itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward);
