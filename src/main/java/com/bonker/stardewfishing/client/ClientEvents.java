@@ -51,12 +51,4 @@ public class ClientEvents {
             }
         }
     }
-
-    @Mod.EventBusSubscriber(modid = StardewFishing.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ModBus {
-        @SubscribeEvent
-        public static void onRegisterGuiOverlays(final RegisterGuiOverlaysEvent event) {
-            event.registerAboveAll(StardewFishing.MODID, FishingOverlay.OVERLAY);
-        }
-    }
 }

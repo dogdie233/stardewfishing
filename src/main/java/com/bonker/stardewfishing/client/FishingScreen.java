@@ -11,16 +11,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
-import org.antlr.v4.runtime.misc.MultiMap;
-import org.apache.logging.log4j.core.util.internal.Status;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Random;
 
 public class FishingScreen extends Screen {
     private static final Component TITLE = Component.literal("Fishing Minigame");
