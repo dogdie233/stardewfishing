@@ -11,6 +11,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -117,6 +119,10 @@ public class FishingHookLogic {
 
             ServerLevel level = player.serverLevel();
             for (ItemStack reward : rewards) {
+                if (reward.is(ItemTags.FISHES)) {
+                    player.awardStat(Stats.FISH_CAUGHT);
+                }
+
                 ItemEntity itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward);
                 double dx = player.getX() - hook.getX();
                 double dy = player.getY() - hook.getY();
