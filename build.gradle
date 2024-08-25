@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
 
 plugins {
     id 'eclipse'
@@ -133,11 +143,25 @@ repositories {
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
+    maven {
+        url "https://girafi.dk/maven/"
+    }
+
+    // for nether depths
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
+    }
+
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-     flatDir {
-         dir 'libs'
-     }
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
@@ -157,13 +181,21 @@ dependencies {
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
-//    implementation fg.deobf("blank:aquaculture-${minecraft_version}:${aquaculture_version}")
+    // implementation fg.deobf("blank:aquaculture-${minecraft_version}:${aquaculture_version}")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+    // aquaculture 2
     implementation fg.deobf("com.teammetallurgy.aquaculture:aquaculture2_${minecraft_version}:${minecraft_version}-${aquaculture_version}")
+
+    // nether depths
+    implementation fg.deobf("blank:netherdepthsupgrade-3.1.5:1.20.1")
+
+    // geckolib (for nether depths)
+    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
+    implementation("com.eliotlash.mclib:mclib:20")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 

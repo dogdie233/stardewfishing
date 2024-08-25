@@ -3,11 +3,6 @@ pluginManagement {
         gradlePluginPortal()
 
         maven {
-            // url of the maven that hosts Aquacultures files
-            url = "https://girafi.dk/maven/"
-        }
-
-        maven {
             name = 'MinecraftForge'
             url = 'https://maven.minecraftforge.net/'
         }
