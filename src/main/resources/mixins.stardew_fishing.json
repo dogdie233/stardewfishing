@@ -5,7 +5,8 @@
   "refmap": "mixins.stardew_fishing.refmap.json",
   "mixins": [
     "AquaFishingBobberEntityMixin",
-    "FishingHookMixin"
+    "FishingHookMixin",
+    "LavaFishingBobberEntityMixin"
   ],
   "client": [],
   "injectors": {
