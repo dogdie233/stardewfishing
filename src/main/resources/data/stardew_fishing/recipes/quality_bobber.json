@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "quality_food"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "xy",
+          "yx"
+        ],
+        "key": {
+          "x": {
+            "item": "minecraft:diamond"
+          },
+          "y": {
+            "item": "minecraft:iron_ingot"
+          }
+        },
+        "result": {
+          "item": "stardew_fishing:quality_bobber",
+          "count": 1
+        }
+      }
+    }
+  ]
+}

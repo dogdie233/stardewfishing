@@ -1,6 +1,7 @@
 package com.bonker.stardewfishing.client;
 
 import com.bonker.stardewfishing.StardewFishing;
+import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -19,13 +20,13 @@ public class ClientEvents {
             if (event.getSound() instanceof SimpleSoundInstance instance) {
                 if (event.getSound().getLocation().getNamespace().equals("minecraft")) {
                     SoundEvent newEvent = switch (event.getSound().getLocation().getPath()) {
-                        case "entity.fishing_bobber.throw" -> StardewFishing.CAST.get();
+                        case "entity.fishing_bobber.throw" -> SFSoundEvents.CAST.get();
                         case "entity.fishing_bobber.retrieve" -> {
                             if (Minecraft.getInstance().level == null) yield null;
                             Player player = Minecraft.getInstance().level.getNearestPlayer(event.getSound().getX(), event.getSound().getY(), event.getSound().getZ(), 1, false);
-                            yield player == null || player.fishing == null ? StardewFishing.PULL_ITEM.get() : StardewFishing.FISH_HIT.get();
+                            yield player == null || player.fishing == null ? SFSoundEvents.PULL_ITEM.get() : SFSoundEvents.FISH_HIT.get();
                         }
-                        case "entity.fishing_bobber.splash" -> StardewFishing.FISH_BITE.get();
+                        case "entity.fishing_bobber.splash" -> SFSoundEvents.FISH_BITE.get();
                         default -> null;
                     };
 

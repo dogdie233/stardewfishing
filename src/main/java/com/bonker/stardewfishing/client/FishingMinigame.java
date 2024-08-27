@@ -1,7 +1,7 @@
 package com.bonker.stardewfishing.client;
 
-import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishBehavior;
+import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import net.minecraft.util.Mth;
 
 import java.util.Random;
@@ -109,7 +109,7 @@ public class FishingMinigame {
 
         if (wasOnFish != bobberOnFish) {
             screen.stopReelingSounds();
-            screen.playSound(StardewFishing.DWOP.get());
+            screen.playSound(SFSoundEvents.DWOP.get());
             screen.reelSoundTimer = 1;
         }
 

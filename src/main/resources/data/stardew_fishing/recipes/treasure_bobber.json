@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "xy",
+    "yx"
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:gold_ingot"
+    },
+    "y": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "stardew_fishing:treasure_bobber",
+    "count": 1
+  }
+}

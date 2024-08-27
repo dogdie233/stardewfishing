@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-    "minecraft:apple"
+    "stardew_fishing:trap_bobber",
+    "stardew_fishing:cork_bobber",
+    "stardew_fishing:sonar_bobber",
+    "stardew_fishing:treasure_bobber",
+    "stardew_fishing:quality_bobber"
   ]
 }

@@ -1,3 +1,9 @@
 {
-  "entity.stardew_fishing.stardew_fishing_hook": "Fishing Bobber"
+  "entity.stardew_fishing.stardew_fishing_hook": "Fishing Bobber",
+  "itemGroup.stardewFishing": "Stardew Fishing",
+  "item.stardew_fishing.trap_bobber": "Trap Bobber",
+  "item.stardew_fishing.cork_bobber": "Cork Bobber",
+  "item.stardew_fishing.sonar_bobber": "Sonar Bobber",
+  "item.stardew_fishing.treasure_bobber": "Treasure Bobber",
+  "item.stardew_fishing.quality_bobber": "Quality Bobber"
 }

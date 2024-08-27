@@ -5,6 +5,7 @@ import com.bonker.stardewfishing.client.util.Animation;
 import com.bonker.stardewfishing.client.util.RenderUtil;
 import com.bonker.stardewfishing.client.util.Shake;
 import com.bonker.stardewfishing.common.FishBehavior;
+import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.C2SCompleteMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -161,7 +162,7 @@ public class FishingScreen extends Screen {
 
                 if (reelSoundTimer == -1 || --reelSoundTimer == 0) {
                     reelSoundTimer = onFish ? REEL_FAST_LENGTH : REEL_SLOW_LENGTH;
-                    playSound(onFish ? StardewFishing.REEL_FAST.get() : StardewFishing.REEL_SLOW.get());
+                    playSound(onFish ? SFSoundEvents.REEL_FAST.get() : SFSoundEvents.REEL_SLOW.get());
                 }
 
                 if (creakSoundTimer > 0) {
@@ -169,7 +170,7 @@ public class FishingScreen extends Screen {
                 }
                 if (mouseDown && creakSoundTimer == 0) {
                     creakSoundTimer = CREAK_LENGTH;
-                    playSound(StardewFishing.REEL_CREAK.get());
+                    playSound(SFSoundEvents.REEL_CREAK.get());
                 }
             }
             case SUCCESS, FAILURE -> {
@@ -190,7 +191,7 @@ public class FishingScreen extends Screen {
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if (pButton == GLFW.GLFW_MOUSE_BUTTON_1 || pButton == GLFW.GLFW_MOUSE_BUTTON_2) {
             if (!mouseDown) {
-                playSound(StardewFishing.REEL_CREAK.get());
+                playSound(SFSoundEvents.REEL_CREAK.get());
                 mouseDown = true;
             }
             return true;
@@ -241,7 +242,7 @@ public class FishingScreen extends Screen {
         fishPos.freeze();
         handleRot.freeze();
 
-        playSound(success ? StardewFishing.COMPLETE.get() : StardewFishing.FISH_ESCAPE.get());
+        playSound(success ? SFSoundEvents.COMPLETE.get() : SFSoundEvents.FISH_ESCAPE.get());
         shake.setValues(2.0F, 1);
     }
 
@@ -250,8 +251,8 @@ public class FishingScreen extends Screen {
     }
 
     public void stopReelingSounds() {
-        minecraft.getSoundManager().stop(StardewFishing.REEL_FAST.getId(), null);
-        minecraft.getSoundManager().stop(StardewFishing.REEL_SLOW.getId(), null);
+        minecraft.getSoundManager().stop(SFSoundEvents.REEL_FAST.getId(), null);
+        minecraft.getSoundManager().stop(SFSoundEvents.REEL_SLOW.getId(), null);
     }
 
     public enum Status {

@@ -2,6 +2,7 @@ package com.bonker.stardewfishing.mixin;
 
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishingHookLogic;
+import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.teammetallurgy.aquaculture.entity.AquaFishingBobberEntity;
 import com.teammetallurgy.aquaculture.init.AquaSounds;
@@ -88,7 +89,7 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook {
             cir.cancel();
         } else {
             FishingHookLogic.modifyRewards(items, 0);
-            player.level().playSound(null, player, StardewFishing.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+            player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
     }
 }
