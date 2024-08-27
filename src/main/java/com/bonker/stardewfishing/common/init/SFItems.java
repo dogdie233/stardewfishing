@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -23,7 +22,7 @@ public class SFItems {
 
     public static final RegistryObject<CreativeModeTab> TAB = CREATIVE_MODE_TABS.register("items", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.stardewFishing"))
-            .icon(() -> new ItemStack(Items.FISHING_ROD))
+            .icon(() -> new ItemStack(QUALITY_BOBBER.get()))
             .displayItems((pParameters, pOutput) -> {
                 pOutput.accept(TRAP_BOBBER.get());
                 pOutput.accept(CORK_BOBBER.get());
