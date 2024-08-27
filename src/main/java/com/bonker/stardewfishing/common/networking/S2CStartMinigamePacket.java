@@ -1,7 +1,7 @@
 package com.bonker.stardewfishing.common.networking;
 
-import com.bonker.stardewfishing.client.ClientEvents;
 import com.bonker.stardewfishing.common.FishBehavior;
+import com.bonker.stardewfishing.proxy.ClientProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -17,6 +17,6 @@ public record S2CStartMinigamePacket(FishBehavior behavior) {
     }
 
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
-        contextSupplier.get().enqueueWork(() -> ClientEvents.openFishingScreen(behavior));
+        contextSupplier.get().enqueueWork(() -> ClientProxy.openFishingScreen(behavior));
     }
 }

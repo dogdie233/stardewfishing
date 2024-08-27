@@ -24,6 +24,7 @@ public class StardewFishing {
     public static final String MODID = "stardew_fishing";
 
     public static boolean QUALITY_FOOD_INSTALLED = false;
+    public static boolean AQUACULTURE_INSTALLED = false;
 
     public static final TagKey<Item> STARTS_MINIGAME = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), new ResourceLocation(MODID, "starts_minigame"));
 

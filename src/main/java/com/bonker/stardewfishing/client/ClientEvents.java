@@ -1,7 +1,6 @@
 package com.bonker.stardewfishing.client;
 
 import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.common.FishBehavior;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -13,10 +12,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 public class ClientEvents {
-    public static void openFishingScreen(FishBehavior behavior) {
-        Minecraft.getInstance().setScreen(new FishingScreen(behavior));
-    }
-
     @Mod.EventBusSubscriber(modid = StardewFishing.MODID, value = Dist.CLIENT)
     public static class ForgeBus {
         @SubscribeEvent
