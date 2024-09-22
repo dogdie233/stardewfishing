@@ -50,5 +50,15 @@
     "sounds": [
       "stardew_fishing:reel_slow"
     ]
+  },
+  "open_chest": {
+    "sounds": [
+      "stardew_fishing:open_chest"
+    ]
+  },
+  "open_chest_golden": {
+    "sounds": [
+      "stardew_fishing:open_chest_golden"
+    ]
   }
 }

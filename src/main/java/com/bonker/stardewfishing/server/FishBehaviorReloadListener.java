@@ -15,8 +15,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -24,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class FishBehaviorReloadListener extends SimplePreparableReloadListener<Map<String, JsonObject>> {
-    private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON_INSTANCE = new Gson();
     private static final ResourceLocation LOCATION = new ResourceLocation(StardewFishing.MODID, "data.json");
     private static FishBehaviorReloadListener INSTANCE;
@@ -45,7 +42,7 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
             ) {
                 objects.put(resource.sourcePackId(), GsonHelper.fromJson(GSON_INSTANCE, reader, JsonObject.class));
             } catch (RuntimeException | IOException exception) {
-                LOGGER.error("Invalid json in fish behavior list {} in data pack {}", LOCATION, resource.sourcePackId(), exception);
+                StardewFishing.LOGGER.error("Invalid json in fish behavior list {} in data pack {}", LOCATION, resource.sourcePackId(), exception);
             }
         }
         return objects;
@@ -55,7 +52,7 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
     protected void apply(Map<String, JsonObject> jsonObjects, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         for (Map.Entry<String, JsonObject> entry : jsonObjects.entrySet()) {
             FishBehaviorList.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-                    .resultOrPartial(errorMsg -> LOGGER.warn("Failed to decode fish behavior list {} in data pack {} - {}", LOCATION, entry.getKey(), errorMsg))
+                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.warn("Failed to decode fish behavior list {} in data pack {} - {}", LOCATION, entry.getKey(), errorMsg))
                     .ifPresent(behaviorList -> {
                         behaviorList.behaviors.forEach((loc, fishBehavior) -> {
                             Item item = ForgeRegistries.ITEMS.getValue(loc);

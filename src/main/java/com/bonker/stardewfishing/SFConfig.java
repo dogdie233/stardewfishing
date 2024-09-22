@@ -14,6 +14,7 @@ public class SFConfig {
     private static final ForgeConfigSpec.DoubleValue QUALITY_1_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_2_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_3_MULTIPLIER;
+    private static final ForgeConfigSpec.DoubleValue BITE_TIME_MULTIPLIER;
 
     static {
         QUALITY_1_THRESHOLD = BUILDER
@@ -40,6 +41,10 @@ public class SFConfig {
                 .comment("The multiplier that is applied to experience gained from fishing a quality 3 reward.")
                 .defineInRange("quality3Multiplier", 4.0, 1, 10);
 
+        BITE_TIME_MULTIPLIER = BUILDER
+                .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
+                .defineInRange("biteTimeMultiplier", 0.1, 0, 1);
+
         SERVER_SPEC = BUILDER.build();
     }
 
@@ -61,5 +66,9 @@ public class SFConfig {
             case 1 -> QUALITY_1_MULTIPLIER.get();
             default -> 1;
         };
+    }
+
+    public static double getBiteTimeMultiplier() {
+        return BITE_TIME_MULTIPLIER.get();
     }
 }

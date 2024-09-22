@@ -4,23 +4,27 @@ import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.util.Animation;
 import com.bonker.stardewfishing.client.util.RenderUtil;
 import com.bonker.stardewfishing.client.util.Shake;
-import com.bonker.stardewfishing.common.FishBehavior;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.C2SCompleteMinigamePacket;
+import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 public class FishingScreen extends Screen {
     private static final Component TITLE = Component.literal("Fishing Minigame");
-    private static final ResourceLocation TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/minigame.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/minigame.png");
+    private static final ResourceLocation CHEST_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/chest.png");
+    private static final ResourceLocation GOLDEN_CHEST_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/golden_chest.png");
 
     private static final int GUI_WIDTH = 38;
     private static final int GUI_HEIGHT = 152;
@@ -39,10 +43,13 @@ public class FishingScreen extends Screen {
 
     private int leftPos, topPos;
     private final FishingMinigame minigame;
-    public Status status = Status.HIT_TEXT;
-    public double accuracy = -1;
+    private final ItemStack fish;
+    private Status status = Status.HIT_TEXT;
+    private double accuracy = -1;
     private boolean mouseDown = false;
     private int animationTimer = 0;
+    private boolean gotChest = false;
+    private boolean goldenChest = false;
 
     private final Animation textSize = new Animation(0);
     private final Animation progressBar;
@@ -50,21 +57,26 @@ public class FishingScreen extends Screen {
     private final Animation bobberAlpha = new Animation(1);
     private final Animation fishPos = new Animation(0);
     private final Animation handleRot = new Animation(0);
+    private final Animation chestProgress = new Animation(0);
 
     private final Shake shake = new Shake(0.75F, 1);
+    private final Shake chestShake = new Shake(0.75F, 1);
 
     public int reelSoundTimer = -1;
     private int creakSoundTimer = 0;
 
-    public FishingScreen(FishBehavior behavior) {
+    private float partialTick = 0;
+
+    public FishingScreen(S2CStartMinigamePacket packet) {
         super(TITLE);
-        this.minigame = new FishingMinigame(this, behavior);
+        this.minigame = new FishingMinigame(this, packet.behavior(), packet.treasureChest(), packet.goldenChest());
+        this.fish = packet.fish();
         this.progressBar = new Animation(minigame.getProgress());
     }
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        final float partialTick = minecraft.getFrameTime();
+        partialTick = minecraft.getFrameTime();
 
         PoseStack poseStack = pGuiGraphics.pose();
 
@@ -78,6 +90,12 @@ public class FishingScreen extends Screen {
             poseStack.scale(scale, scale, 1);
             RenderUtil.blitF(pGuiGraphics, TEXTURE, x * (1 / scale), y * (1 / scale), 71, 0, HIT_WIDTH, HIT_HEIGHT);
             poseStack.popPose();
+        } else if (status == Status.CHEST_OPENING) {
+            // darken screen
+            renderBackground(pGuiGraphics);
+
+            int frame = Math.min(40 - animationTimer, 19) / 2;
+            pGuiGraphics.blit(goldenChest ? GOLDEN_CHEST_TEXTURE : CHEST_TEXTURE, leftPos + 38 / 2 - 64, topPos, 0, frame * 128, 128, 128, 128, 1280);
         } else {
             // darken screen
             renderBackground(pGuiGraphics);
@@ -87,10 +105,24 @@ public class FishingScreen extends Screen {
                     // draw fishing gui
                     pGuiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, GUI_WIDTH, GUI_HEIGHT);
 
+                    // draw sonar bobber
+                    if (minigame.hasSonarBobber()) {
+                        pGuiGraphics.blit(TEXTURE, leftPos + 38, topPos + 2, 185, 0, 26, 25);
+
+                        pGuiGraphics.renderItem(fish, leftPos + 45, topPos + 8);
+                        if (pMouseX >= leftPos + 38 && pMouseY >= topPos + 5 && pMouseX <= leftPos + 64 && pMouseY <= topPos + 27) {
+                            pGuiGraphics.renderTooltip(font, AbstractContainerScreen.getTooltipFromItem(minecraft, fish), fish.getTooltipImage(), fish, pMouseX, pMouseY);
+                        }
+                    }
+
                     // draw bobber
                     RenderUtil.drawWithAlpha(bobberAlpha.getInterpolated(partialTick), () -> {
-                        float bobberY = 4 - 36 + (142 - bobberPos.getInterpolated(partialTick));
-                        RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 18, topPos + bobberY, 38, 0, 9, 36);
+                        float bobberY = 4 - (minigame.hasCorkBobber() ? 46 : 36) + (142 - bobberPos.getInterpolated(partialTick));
+                        if (minigame.hasCorkBobber()) {
+                            RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 18, topPos + bobberY, 38, 36, 9, 46);
+                        } else {
+                            RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 18, topPos + bobberY, 38, 0, 9, 36);
+                        }
                     });
                 });
 
@@ -99,6 +131,23 @@ public class FishingScreen extends Screen {
                     float fishY = 4 - 16 + (142 - fishPos.getInterpolated(partialTick));
                     RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 14, topPos + fishY, 55, 0, 16, 15);
                 });
+
+                if (minigame.isChestVisible()) {
+                    int chestX = leftPos + 16;
+                    float chestY = topPos + 4 - 13 + (142 - minigame.getChestPos());
+                    RenderUtil.drawWithShake(poseStack, chestShake, partialTick, minigame.isBobberOnChest() && status == Status.MINIGAME, () -> {
+                        // draw treasure chest
+                        RenderUtil.blitF(pGuiGraphics, TEXTURE, chestX, chestY, 211, minigame.isGoldenChest() ? 13 : 0, 13, 13);
+                    });
+
+                    // bar bg
+                    RenderUtil.fillF(pGuiGraphics, chestX + 1, chestY + 12, chestX + 12, chestY + 14, 0, 0x55000000);
+
+                    // bar color
+                    float progress = chestProgress.getInterpolated(partialTick);
+                    int color = Mth.hsvToRgb(progress / 3.0F, 1.0F, 1.0F) | 0xFF000000;
+                    RenderUtil.fillF(pGuiGraphics, chestX + 1, chestY + 12, chestX + 1 + progress * 11, chestY + 14, 200, color);
+                }
 
                 // draw progress bar
                 float progress = progressBar.getInterpolated(partialTick);
@@ -134,6 +183,9 @@ public class FishingScreen extends Screen {
     @Override
     public void tick() {
         shake.tick();
+        if (minigame.isChestVisible()) {
+            chestShake.tick();
+        }
 
         switch (status) {
             case HIT_TEXT -> {
@@ -156,9 +208,12 @@ public class FishingScreen extends Screen {
 
                 progressBar.setValue(minigame.getProgress());
                 bobberPos.setValue(minigame.getBobberPos());
-                bobberAlpha.addValue(onFish ? ALPHA_PER_TICK : -ALPHA_PER_TICK, 0.4F, 1);
+                bobberAlpha.addValue((onFish || minigame.isBobberOnChest()) ? ALPHA_PER_TICK : -ALPHA_PER_TICK, 0.4F, 1);
                 fishPos.setValue(minigame.getFishPos());
                 handleRot.addValue(onFish ? HANDLE_ROT_FAST : HANDLE_ROT_SLOW);
+                if (minigame.isChestVisible()) {
+                    chestProgress.setValue(minigame.getChestProgress());
+                }
 
                 if (reelSoundTimer == -1 || --reelSoundTimer == 0) {
                     reelSoundTimer = onFish ? REEL_FAST_LENGTH : REEL_SLOW_LENGTH;
@@ -175,7 +230,14 @@ public class FishingScreen extends Screen {
             }
             case SUCCESS, FAILURE -> {
                 if (--animationTimer == 0) {
-                    onClose();
+                    if (gotChest) {
+                        status = Status.CHEST_OPENING;
+                        animationTimer = 40;
+
+                        playSound(goldenChest ? SFSoundEvents.OPEN_CHEST_GOLDEN.get() : SFSoundEvents.OPEN_CHEST.get());
+                    } else {
+                        onClose();
+                    }
                 } else if (animationTimer >= 15) {
                     textSize.addValue(0.2F);
                 } else if (animationTimer >= 5) {
@@ -184,12 +246,17 @@ public class FishingScreen extends Screen {
                     textSize.addValue(-0.16F);
                 }
             }
+            case CHEST_OPENING -> {
+                if (--animationTimer == 0) {
+                    onClose();
+                }
+            }
         }
     }
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (pButton == GLFW.GLFW_MOUSE_BUTTON_1 || pButton == GLFW.GLFW_MOUSE_BUTTON_2) {
+        if (status == Status.MINIGAME && pButton == GLFW.GLFW_MOUSE_BUTTON_1 || pButton == GLFW.GLFW_MOUSE_BUTTON_2) {
             if (!mouseDown) {
                 playSound(SFSoundEvents.REEL_CREAK.get());
                 mouseDown = true;
@@ -215,7 +282,7 @@ public class FishingScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        SFNetworking.sendToServer(new C2SCompleteMinigamePacket(status == Status.SUCCESS, accuracy));
+        SFNetworking.sendToServer(new C2SCompleteMinigamePacket(status == Status.SUCCESS || status == Status.CHEST_OPENING, accuracy, gotChest));
 
         stopReelingSounds();
     }
@@ -230,19 +297,25 @@ public class FishingScreen extends Screen {
         return status != Status.HIT_TEXT;
     }
 
-    public void setResult(boolean success, double accuracy) {
+    public void setResult(boolean success, double accuracy, boolean gotChest, boolean goldenChest) {
         status = success ? Status.SUCCESS : Status.FAILURE;
         this.accuracy = accuracy;
+        this.gotChest = gotChest;
+        this.goldenChest = goldenChest;
+
         animationTimer = 20;
         textSize.reset(0.0F);
 
-        progressBar.freeze();
-        bobberPos.freeze();
-        bobberAlpha.freeze();
-        fishPos.freeze();
-        handleRot.freeze();
+        progressBar.freeze(partialTick);
+        bobberPos.freeze(partialTick);
+        bobberAlpha.freeze(partialTick);
+        fishPos.freeze(partialTick);
+        handleRot.freeze(partialTick);
+        chestProgress.freeze(partialTick);
 
         playSound(success ? SFSoundEvents.COMPLETE.get() : SFSoundEvents.FISH_ESCAPE.get());
+        stopReelingSounds();
+        reelSoundTimer = -2;
         shake.setValues(2.0F, 1);
     }
 
@@ -251,11 +324,13 @@ public class FishingScreen extends Screen {
     }
 
     public void stopReelingSounds() {
+        reelSoundTimer = 1;
+
         minecraft.getSoundManager().stop(SFSoundEvents.REEL_FAST.getId(), null);
         minecraft.getSoundManager().stop(SFSoundEvents.REEL_SLOW.getId(), null);
     }
 
     public enum Status {
-        HIT_TEXT, MINIGAME, SUCCESS, FAILURE
+        HIT_TEXT, MINIGAME, SUCCESS, FAILURE, CHEST_OPENING
     }
 }

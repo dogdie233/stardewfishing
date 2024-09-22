@@ -1,5 +1,6 @@
 package com.bonker.stardewfishing.mixin;
 
+import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
@@ -13,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +23,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import net.minecraftforge.items.ItemStackHandler;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +37,7 @@ import java.util.List;
 
 @Pseudo
 @Mixin(targets = "com.teammetallurgy.aquaculture.entity.AquaFishingBobberEntity")
-public abstract class AquaFishingBobberEntityMixin extends FishingHook {
+public abstract class AquaFishingBobberEntityMixin extends FishingHook implements FishingHookAccessor {
     @Shadow protected abstract List<ItemStack> getLoot(LootParams lootParams, ServerLevel serverLevel);
 
     @Accessor protected abstract ItemStack getFishingRod();
@@ -45,6 +48,17 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook {
 
     @Inject(method = "catchingFish(Lnet/minecraft/core/BlockPos;)V", at = @At(value = "HEAD"), cancellable = true)
     private void cancel_catchingFish(BlockPos pPos, CallbackInfo ci) {
+        if (getNibble() <= 0 && getTimeUntilHooked() <= 0 && getTimeUntilLured() <= 0) {
+            // replicate vanilla
+            int time = Mth.nextInt(random, 100, 600);
+            time -= getLureSpeed() * 20 * 5;
+
+            // apply configurable reduction
+            time = Math.max(1, (int) (time * SFConfig.getBiteTimeMultiplier()));
+
+            setTimeUntilLured(time);
+        }
+
         if (FishingHookLogic.getStoredRewards(this).isEmpty()) {
             ci.cancel();
         }
@@ -88,7 +102,7 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook {
             FishingHookLogic.startMinigame(player);
             cir.cancel();
         } else {
-            FishingHookLogic.modifyRewards(items, 0);
+            FishingHookLogic.modifyRewards(items, 0, null);
             player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
     }

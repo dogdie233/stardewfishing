@@ -5,6 +5,8 @@
   "refmap": "mixins.stardew_fishing.refmap.json",
   "mixins": [
     "AquaFishingBobberEntityMixin",
+    "ArmorDyeRecipeMixin",
+    "FishingHookAccessor",
     "FishingHookMixin",
     "LavaFishingBobberEntityMixin"
   ],

@@ -6,20 +6,28 @@
         {
           "type": "forge:mod_loaded",
           "modid": "quality_food"
+        },
+        {
+          "type": "forge:mod_loaded",
+          "modid": "aquaculture"
         }
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
         "pattern": [
-          "xy",
-          "yx"
+          " x ",
+          " yx",
+          "z  "
         ],
         "key": {
           "x": {
             "item": "minecraft:diamond"
           },
           "y": {
-            "item": "minecraft:iron_ingot"
+            "item": "minecraft:prismarine_crystals"
+          },
+          "z": {
+            "item": "minecraft:prismarine_shard"
           }
         },
         "result": {

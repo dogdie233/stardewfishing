@@ -1,19 +1,33 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "xy",
-    "yx"
-  ],
-  "key": {
-    "x": {
-      "item": "minecraft:copper_ingot"
-    },
-    "y": {
-      "item": "minecraft:iron_ingot"
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "aquaculture"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "xx",
+          "yy",
+          "xx"
+        ],
+        "key": {
+          "x": {
+            "tag": "forge:stripped_logs"
+          },
+          "y": {
+            "item": "minecraft:barrel"
+          }
+        },
+        "result": {
+          "item": "stardew_fishing:cork_bobber",
+          "count": 1
+        }
+      }
     }
-  },
-  "result": {
-    "item": "stardew_fishing:cork_bobber",
-    "count": 1
-  }
+  ]
 }

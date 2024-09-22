@@ -20,6 +20,8 @@ public class SFSoundEvents {
     public static final RegistryObject<SoundEvent> REEL_CREAK = registerSound("reel_creak");
     public static final RegistryObject<SoundEvent> REEL_FAST = registerSound("reel_fast");
     public static final RegistryObject<SoundEvent> REEL_SLOW = registerSound("reel_slow");
+    public static final RegistryObject<SoundEvent> OPEN_CHEST = registerSound("open_chest");
+    public static final RegistryObject<SoundEvent> OPEN_CHEST_GOLDEN = registerSound("open_chest_golden");
 
     private static RegistryObject<SoundEvent> registerSound(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(StardewFishing.MODID, name)));

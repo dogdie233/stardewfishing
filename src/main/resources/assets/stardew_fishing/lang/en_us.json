@@ -5,5 +5,6 @@
   "item.stardew_fishing.cork_bobber": "Cork Bobber",
   "item.stardew_fishing.sonar_bobber": "Sonar Bobber",
   "item.stardew_fishing.treasure_bobber": "Treasure Bobber",
-  "item.stardew_fishing.quality_bobber": "Quality Bobber"
+  "item.stardew_fishing.quality_bobber": "Quality Bobber",
+  "stardew_fishing.bobber_broke": "Your %s broke!"
 }
