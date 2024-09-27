@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class FishingMinigame {
     private static final int POINTS_TO_FINISH = 120;
-    private static final int TREASURE_CHEST_TIME = 40;
+    private static final int TREASURE_CHEST_TIME = 30;
 
     private static final float UP_ACCELERATION = 0.7F;
     private static final float GRAVITY = -0.7F;

@@ -4,7 +4,8 @@ import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishBehavior;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -19,7 +20,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class FishBehaviorReloadListener extends SimplePreparableReloadListener<Map<String, JsonObject>> {
     private static final Gson GSON_INSTANCE = new Gson();

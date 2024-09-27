@@ -1,13 +1,11 @@
 package com.bonker.stardewfishing.common;
 
 import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.proxy.AquacultureProxy;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.ItemStackedOnOtherEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 

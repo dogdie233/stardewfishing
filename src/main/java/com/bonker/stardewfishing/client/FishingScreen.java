@@ -94,7 +94,7 @@ public class FishingScreen extends Screen {
             // darken screen
             renderBackground(pGuiGraphics);
 
-            int frame = Math.min(40 - animationTimer, 19) / 2;
+            int frame = Math.min(30 - animationTimer, 19) / 2;
             pGuiGraphics.blit(goldenChest ? GOLDEN_CHEST_TEXTURE : CHEST_TEXTURE, leftPos + 38 / 2 - 64, topPos, 0, frame * 128, 128, 128, 128, 1280);
         } else {
             // darken screen
@@ -232,7 +232,7 @@ public class FishingScreen extends Screen {
                 if (--animationTimer == 0) {
                     if (gotChest) {
                         status = Status.CHEST_OPENING;
-                        animationTimer = 40;
+                        animationTimer = 30;
 
                         playSound(goldenChest ? SFSoundEvents.OPEN_CHEST_GOLDEN.get() : SFSoundEvents.OPEN_CHEST.get());
                     } else {

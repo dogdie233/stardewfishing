@@ -43,7 +43,7 @@ public class SFConfig {
 
         BITE_TIME_MULTIPLIER = BUILDER
                 .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
-                .defineInRange("biteTimeMultiplier", 0.1, 0, 1);
+                .defineInRange("biteTimeMultiplier", 0.5, 0, 1);
 
         SERVER_SPEC = BUILDER.build();
     }

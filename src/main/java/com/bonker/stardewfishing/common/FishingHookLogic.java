@@ -8,6 +8,7 @@ import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.AquacultureProxy;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -15,8 +16,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -25,13 +26,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
@@ -82,7 +81,7 @@ public class FishingHookLogic {
                 }
             }
 
-            if (player.getRandom().nextFloat() < chestChance + 1) {
+            if (player.getRandom().nextFloat() < chestChance) {
                 cap.treasureChest = true;
                 if (player.getRandom().nextFloat() < 0.1) {
                     cap.goldenChest = true;
@@ -141,12 +140,15 @@ public class FishingHookLogic {
             ItemFishedEvent event = new ItemFishedEvent(cap.rewards, hook.onGround() ? 2 : 1, hook);
             MinecraftForge.EVENT_BUS.post(event);
             if (event.isCanceled()) {
-                hook.discard();
-                return;
+                cap.rewards.clear();
             }
 
             if (cap.treasureChest && gotChest) {
                 cap.rewards.addAll(getTreasureChestLoot(player.serverLevel(), cap.goldenChest));
+            }
+
+            if (cap.rewards.isEmpty()) {
+                hook.discard();
             }
 
             ServerLevel level = player.serverLevel();
@@ -155,11 +157,23 @@ public class FishingHookLogic {
                     player.awardStat(Stats.FISH_CAUGHT);
                 }
 
-                ItemEntity itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward);
+                ItemEntity itementity;
+                if (level.getFluidState(hook.blockPosition()).is(FluidTags.LAVA)) {
+                    itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward) {
+                        public boolean displayFireAnimation() {
+                            return false;
+                        }
+
+                        public void lavaHurt() {
+                        }
+                    };
+                } else {
+                    itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward);
+                }
+                double scale = 0.1;
                 double dx = player.getX() - hook.getX();
                 double dy = player.getY() - hook.getY();
                 double dz = player.getZ() - hook.getZ();
-                double scale = 0.1;
                 itementity.setDeltaMovement(dx * scale, dy * scale + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08, dz * scale);
                 level.addFreshEntity(itementity);
 
