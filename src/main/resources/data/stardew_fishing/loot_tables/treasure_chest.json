@@ -560,7 +560,7 @@
           "type": "minecraft:tag",
           "name": "minecraft:decorated_pot_sherds",
           "expand": true,
-          "weight": 16,
+          "weight": 10,
           "functions": [
             {
               "function": "minecraft:set_count",

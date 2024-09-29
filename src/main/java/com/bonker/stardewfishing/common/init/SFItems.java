@@ -1,17 +1,17 @@
 package com.bonker.stardewfishing.common.init;
 
 import com.bonker.stardewfishing.StardewFishing;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.DyeableLeatherItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class SFItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, StardewFishing.MODID);
@@ -41,8 +41,18 @@ public class SFItems {
             .build());
 
     public static class BobberItem extends Item implements DyeableLeatherItem {
+        private Component tooltip;
+
         public BobberItem(Properties pProperties) {
             super(pProperties);
+        }
+
+        @Override
+        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+            if (tooltip == null) {
+                tooltip = Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY);
+            }
+            pTooltipComponents.add(tooltip);
         }
     }
 }

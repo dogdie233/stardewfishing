@@ -130,8 +130,8 @@
     "salmon": {
       "idle_time": 10,
       "top_speed": 1.5,
-      "up_acceleration": 0.7,
-      "down_acceleration": 0.7,
+      "up_acceleration": 0.8,
+      "down_acceleration": 0.8,
       "avg_distance": 55,
       "move_variation": 10
     },
@@ -200,12 +200,12 @@
     },
 
     "cod": {
-      "idle_time": 20,
-      "top_speed": 4,
-      "up_acceleration": 0.4,
-      "down_acceleration": 0.4,
-      "avg_distance": 60,
-      "move_variation": 15
+      "idle_time": 10,
+      "top_speed": 1.5,
+      "up_acceleration": 0.7,
+      "down_acceleration": 0.7,
+      "avg_distance": 55,
+      "move_variation": 10
     },
 
     "tropical_fish": {
@@ -338,11 +338,11 @@
     
   },
   "defaultBehavior": {
-    "idle_time": 25,
-    "top_speed": 8,
-    "up_acceleration": 0.4,
-    "down_acceleration": 0.8,
-    "avg_distance": 50,
-    "move_variation": 35
+      "idle_time": 10,
+      "top_speed": 1.5,
+      "up_acceleration": 0.7,
+      "down_acceleration": 0.7,
+      "avg_distance": 55,
+      "move_variation": 10
   }
 }
