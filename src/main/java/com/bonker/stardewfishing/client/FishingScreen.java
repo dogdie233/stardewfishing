@@ -19,7 +19,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import org.apache.logging.log4j.core.util.internal.Status;
 import org.lwjgl.glfw.GLFW;
 
 public class FishingScreen extends Screen {

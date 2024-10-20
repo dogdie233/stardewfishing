@@ -8,9 +8,9 @@ import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.AquacultureProxy;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
-import net.minecraft.core.BlockPos;
+import de.cadentem.quality_food.core.Quality;
+import de.cadentem.quality_food.util.QualityUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,11 +27,9 @@ import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -39,7 +37,6 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,9 +120,7 @@ public class FishingHookLogic {
                             reward.setTag(null);
                         }
                     } else if (quality > 0) {
-                        CompoundTag qualityFood = new CompoundTag();
-                        qualityFood.putInt("quality", quality);
-                        reward.getOrCreateTag().put("quality_food", qualityFood);
+                        QualityUtils.applyQuality(reward, Quality.get(quality));
                     }
                 }
             }
@@ -137,12 +132,6 @@ public class FishingHookLogic {
 
         FishingHook hook = player.fishing;
         hook.getCapability(CapProvider.CAP).ifPresent(cap -> {
-            ItemFishedEvent event = new ItemFishedEvent(cap.rewards, hook.onGround() ? 2 : 1, hook);
-            MinecraftForge.EVENT_BUS.post(event);
-            if (event.isCanceled()) {
-                cap.rewards.clear();
-            }
-
             if (cap.treasureChest && gotChest) {
                 cap.rewards.addAll(getTreasureChestLoot(player.serverLevel(), cap.goldenChest));
             }
