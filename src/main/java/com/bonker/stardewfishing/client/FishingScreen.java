@@ -113,7 +113,7 @@ public class FishingScreen extends Screen {
 
                         pGuiGraphics.renderItem(fish, leftPos + 45, topPos + 8);
                         if (pMouseX >= leftPos + 38 && pMouseY >= topPos + 5 && pMouseX <= leftPos + 64 && pMouseY <= topPos + 27) {
-                            pGuiGraphics.renderTooltip(font, AbstractContainerScreen.getTooltipFromItem(minecraft, fish), fish.getTooltipImage(), fish, pMouseX, pMouseY);
+                            pGuiGraphics.renderTooltip(font, AbstractContainerScreen.getTooltipFromItem(minecraft, fish).subList(0, 1), fish.getTooltipImage(), fish, pMouseX, pMouseY);
                         }
                     }
 
