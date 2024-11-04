@@ -60,5 +60,10 @@
     "sounds": [
       "stardew_fishing:open_chest_golden"
     ]
+  },
+  "chest_get": {
+    "sounds": [
+      "stardew_fishing:chest_get"
+    ]
   }
 }

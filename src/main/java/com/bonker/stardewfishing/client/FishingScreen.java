@@ -16,7 +16,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
@@ -248,7 +247,7 @@ public class FishingScreen extends Screen {
                     if (animationTimer == Integer.MIN_VALUE) {
                         animationTimer = -5;
 
-                        playSound(SoundEvents.GENERIC_EXPLODE);
+                        playSound(SFSoundEvents.CHEST_GET.get());
                     }
 
                     if (animationTimer < 0) {
