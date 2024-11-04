@@ -6,6 +6,7 @@ import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.proxy.AquacultureProxy;
+import com.bonker.stardewfishing.proxy.BobberGetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -61,21 +62,19 @@ public class FishingMinigame {
         this.chestAppearTime = treasureChest ? (int) (20 + 40 * random.nextFloat()) : -1;
 
         // set bobber flags
-        if (StardewFishing.AQUACULTURE_INSTALLED) {
-            Player player = Minecraft.getInstance().player;
-            if (player != null) {
-                InteractionHand hand = FishingHookLogic.getRodHand(player);
-                if (hand != null) {
-                    Item bobberItem = AquacultureProxy.getBobber(player.getItemInHand(hand)).getItem();
-                    if (bobberItem == SFItems.CORK_BOBBER.get()) {
-                        hasCorkBobber = true;
-                    } else if (bobberItem == SFItems.SONAR_BOBBER.get()) {
-                        hasSonarBobber = true;
-                    } else if (bobberItem == SFItems.TRAP_BOBBER.get()) {
-                        hasTrapBobber = true;
-                    } else if (bobberItem == SFItems.TREASURE_BOBBER.get()) {
-                        hasTreasureBobber = true;
-                    }
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            InteractionHand hand = FishingHookLogic.getRodHand(player);
+            if (hand != null) {
+                Item bobberItem = BobberGetter.getBobber(player.getItemInHand(hand)).getItem();
+                if (bobberItem == SFItems.CORK_BOBBER.get()) {
+                    hasCorkBobber = true;
+                } else if (bobberItem == SFItems.SONAR_BOBBER.get()) {
+                    hasSonarBobber = true;
+                } else if (bobberItem == SFItems.TRAP_BOBBER.get()) {
+                    hasTrapBobber = true;
+                } else if (bobberItem == SFItems.TREASURE_BOBBER.get()) {
+                    hasTreasureBobber = true;
                 }
             }
         }

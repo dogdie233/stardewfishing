@@ -25,6 +25,8 @@ public class StardewFishing {
 
     public static final boolean QUALITY_FOOD_INSTALLED = ModList.get().isLoaded("quality_food");
     public static final boolean AQUACULTURE_INSTALLED = ModList.get().isLoaded("aquaculture");
+    public static final boolean TIDE_INSTALLED = ModList.get().isLoaded("tide");
+    public static final boolean BOBBER_ITEMS_REGISTERED = AQUACULTURE_INSTALLED || TIDE_INSTALLED;
 
     public static final TagKey<Item> STARTS_MINIGAME = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), new ResourceLocation(MODID, "starts_minigame"));
 
@@ -37,7 +39,7 @@ public class StardewFishing {
         SFSoundEvents.SOUND_EVENTS.register(bus);
         SFLootPoolEntryTypes.LOOT_POOL_ENTRY_TYPES.register(bus);
 
-        if (AQUACULTURE_INSTALLED) {
+        if (BOBBER_ITEMS_REGISTERED) {
             SFItems.ITEMS.register(bus);
             SFItems.CREATIVE_MODE_TABS.register(bus);
         }

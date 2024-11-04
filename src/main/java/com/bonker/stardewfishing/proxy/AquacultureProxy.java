@@ -29,4 +29,8 @@ public class AquacultureProxy {
     public static ItemStack getBobber(ItemStack fishingRod) {
         return AquaFishingRodItem.getBobber(fishingRod);
     }
+
+    public static boolean isAquaRod(ItemStack fishingRod) {
+        return fishingRod.getItem() instanceof AquaFishingRodItem;
+    }
 }

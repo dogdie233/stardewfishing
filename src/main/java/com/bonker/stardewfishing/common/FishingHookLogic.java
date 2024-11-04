@@ -7,6 +7,7 @@ import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.AquacultureProxy;
+import com.bonker.stardewfishing.proxy.BobberGetter;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
 import de.cadentem.quality_food.core.Quality;
 import de.cadentem.quality_food.util.QualityUtils;
@@ -69,10 +70,10 @@ public class FishingHookLogic {
                     .orElseThrow();
 
             float chestChance = 0.15F;
-            if (StardewFishing.AQUACULTURE_INSTALLED) {
+            if (StardewFishing.BOBBER_ITEMS_REGISTERED) {
                 InteractionHand hand = FishingHookLogic.getRodHand(player);
                 if (hand != null) {
-                    if (AquacultureProxy.getBobber(player.getItemInHand(hand)).is(SFItems.TREASURE_BOBBER.get())) {
+                    if (BobberGetter.getBobber(player.getItemInHand(hand)).is(SFItems.TREASURE_BOBBER.get())) {
                         chestChance += 0.05F;
                     }
                 }
@@ -210,10 +211,10 @@ public class FishingHookLogic {
     }
 
     public static boolean hasBobber(@Nullable ItemStack fishingRod, Supplier<Item> itemSupplier) {
-        if (!StardewFishing.AQUACULTURE_INSTALLED || fishingRod == null) {
+        if (!StardewFishing.BOBBER_ITEMS_REGISTERED || fishingRod == null) {
             return false;
         }
-        return AquacultureProxy.getBobber(fishingRod).is(itemSupplier.get());
+        return BobberGetter.getBobber(fishingRod).is(itemSupplier.get());
     }
 
     private static class CapProvider implements ICapabilityProvider {
