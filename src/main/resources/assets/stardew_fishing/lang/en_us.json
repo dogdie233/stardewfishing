@@ -10,6 +10,7 @@
   "item.stardew_fishing.cork_bobber.tooltip": "Slightly increases the size of your \"fishing bar\", making it easier to catch fish",
   "item.stardew_fishing.sonar_bobber.tooltip": "Shows what fish is on the line before it's caught",
   "item.stardew_fishing.treasure_bobber.tooltip": "Fish don't escape while collecting treasures. Also slightly increases the chance to find treasures",
-  "item.stardew_fishing.quality_bobber.tooltip": "Boosts the Quality of fish that you catch",
+  "item.stardew_fishing.quality_bobber.tooltip": "Greatly increases experience gained from fishing",
+  "item.stardew_fishing.quality_bobber.quality_food_tooltip": "Also boosts the Quality of fish that you catch",
   "stardew_fishing.bobber_broke": "Your %s broke!"
 }

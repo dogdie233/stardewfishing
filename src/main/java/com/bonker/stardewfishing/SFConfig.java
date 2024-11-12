@@ -14,6 +14,7 @@ public class SFConfig {
     private static final ForgeConfigSpec.DoubleValue QUALITY_1_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_2_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_3_MULTIPLIER;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_BOBBER_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue BITE_TIME_MULTIPLIER;
 
     static {
@@ -41,6 +42,10 @@ public class SFConfig {
                 .comment("The multiplier that is applied to experience gained from fishing a quality 3 reward.")
                 .defineInRange("quality3Multiplier", 4.0, 1, 10);
 
+        QUALITY_BOBBER_MULTIPLIER = BUILDER
+                .comment("The multiplier that is applied to experience gained from fishing with a quality bobber equipped.")
+                .defineInRange("qualityBobberMultiplier", 1.4, 1, 10);
+
         BITE_TIME_MULTIPLIER = BUILDER
                 .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
                 .defineInRange("biteTimeMultiplier", 0.5, 0, 1);
@@ -59,13 +64,14 @@ public class SFConfig {
         return 0;
     }
 
-    public static double getMultiplier(double accuracy) {
-        return switch(getQuality(accuracy)) {
+    public static double getMultiplier(double accuracy, boolean qualityBobber) {
+        double multiplier = switch(getQuality(accuracy)) {
             case 3 -> QUALITY_3_MULTIPLIER.get();
             case 2 -> QUALITY_2_MULTIPLIER.get();
             case 1 -> QUALITY_1_MULTIPLIER.get();
             default -> 1;
         };
+        return qualityBobber ? multiplier * QUALITY_BOBBER_MULTIPLIER.get() : multiplier;
     }
 
     public static double getBiteTimeMultiplier() {

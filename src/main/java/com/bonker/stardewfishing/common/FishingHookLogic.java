@@ -6,11 +6,9 @@ import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
-import com.bonker.stardewfishing.proxy.AquacultureProxy;
 import com.bonker.stardewfishing.proxy.BobberGetter;
+import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
-import de.cadentem.quality_food.core.Quality;
-import de.cadentem.quality_food.util.QualityUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -73,7 +71,7 @@ public class FishingHookLogic {
             if (StardewFishing.BOBBER_ITEMS_REGISTERED) {
                 InteractionHand hand = FishingHookLogic.getRodHand(player);
                 if (hand != null) {
-                    if (BobberGetter.getBobber(player.getItemInHand(hand)).is(SFItems.TREASURE_BOBBER.get())) {
+                    if (hasBobber(player.getItemInHand(hand), SFItems.TREASURE_BOBBER)) {
                         chestChance += 0.05F;
                     }
                 }
@@ -121,7 +119,7 @@ public class FishingHookLogic {
                             reward.setTag(null);
                         }
                     } else if (quality > 0) {
-                        QualityUtils.applyQuality(reward, Quality.get(quality));
+                        QualityFoodProxy.applyQuality(reward, quality);
                     }
                 }
             }
@@ -167,7 +165,10 @@ public class FishingHookLogic {
                 itementity.setDeltaMovement(dx * scale, dy * scale + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08, dz * scale);
                 level.addFreshEntity(itementity);
 
-                int exp = (int) ((player.getRandom().nextInt(6) + 1) * SFConfig.getMultiplier(accuracy));
+                InteractionHand hand = FishingHookLogic.getRodHand(player);
+                boolean qualityBobber = hand != null && hasBobber(player.getItemInHand(hand), SFItems.QUALITY_BOBBER);
+                int exp = (int) ((player.getRandom().nextInt(6) + 1) * SFConfig.getMultiplier(accuracy, qualityBobber));
+
                 level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, exp));
             }
 

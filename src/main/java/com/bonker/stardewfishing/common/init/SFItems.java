@@ -1,6 +1,7 @@
 package com.bonker.stardewfishing.common.init;
 
 import com.bonker.stardewfishing.StardewFishing;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -21,10 +22,17 @@ public class SFItems {
     public static final RegistryObject<Item> CORK_BOBBER = ITEMS.register("cork_bobber", () -> new BobberItem(new Item.Properties().durability(64)));
     public static final RegistryObject<Item> SONAR_BOBBER = ITEMS.register("sonar_bobber", () -> new BobberItem(new Item.Properties().durability(64)));
     public static final RegistryObject<Item> TREASURE_BOBBER = ITEMS.register("treasure_bobber", () -> new BobberItem(new Item.Properties().durability(64)));
-    @Nullable
-    public static final RegistryObject<Item> QUALITY_BOBBER = StardewFishing.QUALITY_FOOD_INSTALLED ?
-            ITEMS.register("quality_bobber", () -> new BobberItem(new Item.Properties().durability(64)))
-            : null;
+    public static final RegistryObject<Item> QUALITY_BOBBER = ITEMS.register("quality_bobber", () -> new BobberItem(new Item.Properties().durability(64)) {
+        @Override
+        protected List<Component> makeTooltip() {
+            ImmutableList.Builder<Component> builder = new ImmutableList.Builder<>();
+            builder.add(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
+            if (StardewFishing.QUALITY_FOOD_INSTALLED) {
+                builder.add(Component.translatable(getDescriptionId() + ".quality_food_tooltip").withStyle(ChatFormatting.GRAY));
+            }
+            return builder.build();
+        }
+    });
 
     public static final RegistryObject<CreativeModeTab> TAB = CREATIVE_MODE_TABS.register("items", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.stardewFishing"))
@@ -34,25 +42,27 @@ public class SFItems {
                 pOutput.accept(CORK_BOBBER.get());
                 pOutput.accept(SONAR_BOBBER.get());
                 pOutput.accept(TREASURE_BOBBER.get());
-                if (QUALITY_BOBBER != null) {
-                    pOutput.accept(QUALITY_BOBBER.get());
-                }
+                pOutput.accept(QUALITY_BOBBER.get());
             })
             .build());
 
     public static class BobberItem extends Item implements DyeableLeatherItem {
-        private Component tooltip;
+        private List<Component> tooltip;
 
         public BobberItem(Properties pProperties) {
             super(pProperties);
         }
 
+        protected List<Component> makeTooltip() {
+            return List.of(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
+        }
+
         @Override
         public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
             if (tooltip == null) {
-                tooltip = Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY);
+                tooltip = makeTooltip();
             }
-            pTooltipComponents.add(tooltip);
+            pTooltipComponents.addAll(tooltip);
         }
     }
 }
