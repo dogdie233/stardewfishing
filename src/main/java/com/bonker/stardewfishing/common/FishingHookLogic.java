@@ -104,6 +104,11 @@ public class FishingHookLogic {
         getStoredRewards(player.fishing).ifPresent(rewards -> modifyRewards(rewards, accuracy, fishingRod));
     }
 
+    // added to avoid breaking tide support
+    public static void modifyRewards(List<ItemStack> rewards, double accuracy) {
+        modifyRewards(rewards, accuracy, null);
+    }
+
     public static void modifyRewards(List<ItemStack> rewards, double accuracy, @Nullable ItemStack fishingRod) {
         if (StardewFishing.QUALITY_FOOD_INSTALLED) {
             int quality = SFConfig.getQuality(accuracy);

@@ -1,10 +1,12 @@
 package com.bonker.stardewfishing.common.init;
 
 import com.bonker.stardewfishing.StardewFishing;
+import com.bonker.stardewfishing.proxy.TideProxy;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.DeferredRegister;
@@ -55,6 +57,16 @@ public class SFItems {
 
         protected List<Component> makeTooltip() {
             return List.of(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
+        }
+
+        // called by tide
+        public ResourceLocation getTextureLocation() {
+            return TideProxy.DEFAULT_BOBBER_TEXTURE;
+        }
+
+        // called by tide
+        public Component getTranslation() {
+            return getDescription();
         }
 
         @Override

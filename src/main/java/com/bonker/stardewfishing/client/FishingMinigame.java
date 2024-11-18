@@ -5,7 +5,6 @@ import com.bonker.stardewfishing.common.FishBehavior;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
-import com.bonker.stardewfishing.proxy.AquacultureProxy;
 import com.bonker.stardewfishing.proxy.BobberGetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
@@ -63,7 +62,7 @@ public class FishingMinigame {
 
         // set bobber flags
         Player player = Minecraft.getInstance().player;
-        if (player != null) {
+        if (StardewFishing.BOBBER_ITEMS_REGISTERED && player != null) {
             InteractionHand hand = FishingHookLogic.getRodHand(player);
             if (hand != null) {
                 Item bobberItem = BobberGetter.getBobber(player.getItemInHand(hand)).getItem();
