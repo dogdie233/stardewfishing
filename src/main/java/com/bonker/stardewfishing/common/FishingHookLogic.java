@@ -67,19 +67,19 @@ public class FishingHookLogic {
                     .findFirst()
                     .orElseThrow();
 
-            float chestChance = 0.15F;
-            if (StardewFishing.BOBBER_ITEMS_REGISTERED) {
+            double chestChance = SFConfig.getTreasureChestChance();
+            if (StardewFishing.BOBBER_ITEMS_REGISTERED && chestChance < 1) {
                 InteractionHand hand = FishingHookLogic.getRodHand(player);
                 if (hand != null) {
                     if (hasBobber(player.getItemInHand(hand), SFItems.TREASURE_BOBBER)) {
-                        chestChance += 0.05F;
+                        chestChance += 0.05;
                     }
                 }
             }
 
             if (player.getRandom().nextFloat() < chestChance) {
                 cap.treasureChest = true;
-                if (player.getRandom().nextFloat() < 0.1) {
+                if (player.getRandom().nextFloat() < SFConfig.getGoldenChestChance()) {
                     cap.goldenChest = true;
                 }
             }

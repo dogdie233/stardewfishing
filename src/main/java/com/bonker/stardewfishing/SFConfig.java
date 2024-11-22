@@ -16,6 +16,8 @@ public class SFConfig {
     private static final ForgeConfigSpec.DoubleValue QUALITY_3_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_BOBBER_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue BITE_TIME_MULTIPLIER;
+    private static final ForgeConfigSpec.DoubleValue TREASURE_CHEST_CHANCE;
+    private static final ForgeConfigSpec.DoubleValue GOLDEN_CHEST_CHANCE;
 
     static {
         QUALITY_1_THRESHOLD = BUILDER
@@ -50,6 +52,14 @@ public class SFConfig {
                 .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
                 .defineInRange("biteTimeMultiplier", 0.5, 0, 1);
 
+        TREASURE_CHEST_CHANCE = BUILDER
+                .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
+                .defineInRange("biteTimeMultiplier", 0.15, 0, 1);
+
+        GOLDEN_CHEST_CHANCE = BUILDER
+                .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
+                .defineInRange("biteTimeMultiplier", 0.1, 0, 1);
+
         SERVER_SPEC = BUILDER.build();
     }
 
@@ -76,5 +86,13 @@ public class SFConfig {
 
     public static double getBiteTimeMultiplier() {
         return BITE_TIME_MULTIPLIER.get();
+    }
+
+    public static double getTreasureChestChance() {
+        return TREASURE_CHEST_CHANCE.get();
+    }
+
+    public static double getGoldenChestChance() {
+        return GOLDEN_CHEST_CHANCE.get();
     }
 }
