@@ -6,6 +6,7 @@ import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -15,10 +16,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 @Mod(StardewFishing.MODID)
 public class StardewFishing {
+    public static RegistryObject<SoundEvent> PULL_ITEM; //TODO remove this, temporary tide fix
     public static final String MODID = "stardew_fishing";
 
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -37,6 +40,7 @@ public class StardewFishing {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
         SFSoundEvents.SOUND_EVENTS.register(bus);
+        PULL_ITEM = SFSoundEvents.PULL_ITEM; //TODO remove this, temporary tide fix
         SFLootPoolEntryTypes.LOOT_POOL_ENTRY_TYPES.register(bus);
 
         if (BOBBER_ITEMS_REGISTERED) {
