@@ -4,12 +4,17 @@
     {
       "conditions": [
         {
-          "type": "forge:mod_loaded",
-          "modid": "quality_food"
-        },
-        {
-          "type": "forge:mod_loaded",
-          "modid": "aquaculture"
+          "type": "forge:and",
+          "values": [
+            {
+              "type": "forge:mod_loaded",
+              "modid": "aquaculture"
+            },
+            {
+              "type": "forge:mod_loaded",
+              "modid": "tide"
+            }
+          ]
         }
       ],
       "recipe": {
