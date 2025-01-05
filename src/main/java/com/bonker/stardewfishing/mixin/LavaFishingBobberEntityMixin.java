@@ -5,7 +5,6 @@ import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -65,7 +64,6 @@ public abstract class LavaFishingBobberEntityMixin extends FishingHook {
         if (player == null) return;
 
         if (items.stream().anyMatch(stack -> stack.is(StardewFishing.STARTS_MINIGAME))) {
-            CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, pStack, this, items);
             FishingHookLogic.getStoredRewards(this).ifPresent(rewards -> rewards.addAll(items));
             FishingHookLogic.startMinigame(player);
             cir.cancel();

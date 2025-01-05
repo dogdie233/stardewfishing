@@ -8,7 +8,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.teammetallurgy.aquaculture.entity.AquaFishingBobberEntity;
 import com.teammetallurgy.aquaculture.init.AquaSounds;
 import com.teammetallurgy.aquaculture.item.AquaFishingRodItem;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -75,7 +74,6 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook implement
 
         if (items.stream().anyMatch(stack -> stack.is(StardewFishing.STARTS_MINIGAME))) {
             FishingHookLogic.getStoredRewards(hook).ifPresent(rewards -> rewards.addAll(items));
-            CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, pStack, this, items);
             if (hook.hasHook() && hook.getHook().getDoubleCatchChance() > 0.0 && this.random.nextDouble() <= hook.getHook().getDoubleCatchChance()) {
                 List<ItemStack> doubleLoot = getLoot(lootParams, serverLevel);
                 if (!doubleLoot.isEmpty()) {

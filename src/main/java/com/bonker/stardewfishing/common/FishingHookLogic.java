@@ -9,6 +9,7 @@ import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.BobberGetter;
 import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -91,7 +92,7 @@ public class FishingHookLogic {
     public static void endMinigame(Player player, boolean success, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
         if (success && !player.level().isClientSide) {
             modifyRewards((ServerPlayer) player, accuracy, fishingRod);
-            giveRewards((ServerPlayer) player, accuracy, gotChest);
+            giveRewards((ServerPlayer) player, accuracy, gotChest, fishingRod);
         }
 
         if (player.fishing != null) {
@@ -131,7 +132,7 @@ public class FishingHookLogic {
         }
     }
 
-    public static void giveRewards(ServerPlayer player, double accuracy, boolean gotChest) {
+    public static void giveRewards(ServerPlayer player, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
         if (player.fishing == null) return;
 
         FishingHook hook = player.fishing;
@@ -146,6 +147,10 @@ public class FishingHookLogic {
 
             ServerLevel level = player.serverLevel();
             for (ItemStack reward : cap.rewards) {
+                if (fishingRod != null) {
+                    CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, fishingRod, hook, cap.rewards);
+                }
+
                 if (reward.is(ItemTags.FISHES)) {
                     player.awardStat(Stats.FISH_CAUGHT);
                 }
