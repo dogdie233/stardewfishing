@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 
 @Mod(StardewFishing.MODID)
 public class StardewFishing {
+    @Deprecated(since = "2.0", forRemoval = true)
     public static RegistryObject<SoundEvent> PULL_ITEM; //TODO remove this, temporary tide fix
     public static final String MODID = "stardew_fishing";
 
