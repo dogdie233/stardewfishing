@@ -92,7 +92,7 @@ public class FishingHookLogic {
     public static void endMinigame(Player player, boolean success, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
         if (success && !player.level().isClientSide) {
             modifyRewards((ServerPlayer) player, accuracy, fishingRod);
-            giveRewards((ServerPlayer) player, accuracy, gotChest, fishingRod);
+            giveRewards((ServerPlayer) player, accuracy, gotChest);
         }
 
         if (player.fishing != null) {
@@ -105,7 +105,7 @@ public class FishingHookLogic {
         getStoredRewards(player.fishing).ifPresent(rewards -> modifyRewards(rewards, accuracy, fishingRod));
     }
 
-    // added to avoid breaking tide support
+    // todo: added to avoid breaking tide support
     public static void modifyRewards(List<ItemStack> rewards, double accuracy) {
         modifyRewards(rewards, accuracy, null);
     }
@@ -132,7 +132,7 @@ public class FishingHookLogic {
         }
     }
 
-    public static void giveRewards(ServerPlayer player, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
+    public static void giveRewards(ServerPlayer player, double accuracy, boolean gotChest) {
         if (player.fishing == null) return;
 
         FishingHook hook = player.fishing;
@@ -147,10 +147,6 @@ public class FishingHookLogic {
 
             ServerLevel level = player.serverLevel();
             for (ItemStack reward : cap.rewards) {
-                if (fishingRod != null) {
-                    CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, fishingRod, hook, cap.rewards);
-                }
-
                 if (reward.is(ItemTags.FISHES)) {
                     player.awardStat(Stats.FISH_CAUGHT);
                 }
@@ -176,10 +172,13 @@ public class FishingHookLogic {
                 level.addFreshEntity(itementity);
 
                 InteractionHand hand = FishingHookLogic.getRodHand(player);
-                boolean qualityBobber = hand != null && hasBobber(player.getItemInHand(hand), SFItems.QUALITY_BOBBER);
+                ItemStack handItem = hand != null ? player.getItemInHand(hand) : ItemStack.EMPTY;
+                boolean qualityBobber = hand != null && hasBobber(handItem, SFItems.QUALITY_BOBBER);
                 int exp = (int) ((player.getRandom().nextInt(6) + 1) * SFConfig.getMultiplier(accuracy, qualityBobber));
 
                 level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, exp));
+
+                CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, handItem, hook, cap.rewards);
             }
 
             player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
