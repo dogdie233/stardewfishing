@@ -65,8 +65,9 @@ public abstract class LavaFishingBobberEntityMixin extends FishingHook {
 
         if (items.stream().anyMatch(stack -> stack.is(StardewFishing.STARTS_MINIGAME))) {
             FishingHookLogic.getStoredRewards(this).ifPresent(rewards -> rewards.addAll(items));
-            FishingHookLogic.startMinigame(player);
-            cir.cancel();
+            if (FishingHookLogic.startMinigame(player)) {
+                cir.cancel();
+            }
         } else {
             FishingHookLogic.modifyRewards(items, 0, null);
             player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);

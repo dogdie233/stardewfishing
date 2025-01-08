@@ -35,6 +35,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.jetbrains.annotations.NotNull;
@@ -59,8 +60,8 @@ public class FishingHookLogic {
         return entity.getCapability(CapProvider.CAP).map(cap -> cap.rewards);
     }
 
-    public static void startMinigame(ServerPlayer player) {
-        if (player.fishing == null) return;
+    public static boolean startMinigame(ServerPlayer player) {
+        if (player.fishing == null || player instanceof FakePlayer) return false;
 
         player.fishing.getCapability(CapProvider.CAP).resolve().ifPresent(cap -> {
             ItemStack fish = cap.rewards.stream()
@@ -87,6 +88,8 @@ public class FishingHookLogic {
 
             SFNetworking.sendToPlayer(player, new S2CStartMinigamePacket(FishBehaviorReloadListener.getBehavior(fish), fish, cap.treasureChest, cap.goldenChest));
         });
+
+        return true;
     }
 
     public static void endMinigame(Player player, boolean success, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {

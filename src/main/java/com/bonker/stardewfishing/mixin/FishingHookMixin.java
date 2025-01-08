@@ -60,8 +60,9 @@ public abstract class FishingHookMixin extends Entity implements FishingHookAcce
 
         if (items.stream().anyMatch(stack -> stack.is(StardewFishing.STARTS_MINIGAME))) {
             FishingHookLogic.getStoredRewards(hook).ifPresent(rewards -> rewards.addAll(items));
-            FishingHookLogic.startMinigame(player);
-            cir.cancel();
+            if (FishingHookLogic.startMinigame(player)) {
+                cir.cancel();
+            }
         } else {
             FishingHookLogic.modifyRewards(items, 0, null);
             player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);

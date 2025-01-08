@@ -96,8 +96,9 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook implement
                 }
             }
 
-            FishingHookLogic.startMinigame(player);
-            cir.cancel();
+            if (FishingHookLogic.startMinigame(player)) {
+                cir.cancel();
+            }
         } else {
             FishingHookLogic.modifyRewards(items, 0, null);
             player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
