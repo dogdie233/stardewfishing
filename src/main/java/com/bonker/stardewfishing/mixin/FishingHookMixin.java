@@ -60,7 +60,7 @@ public abstract class FishingHookMixin extends Entity implements FishingHookAcce
 
         if (items.stream().anyMatch(stack -> stack.is(StardewFishing.STARTS_MINIGAME))) {
             FishingHookLogic.getStoredRewards(hook).ifPresent(rewards -> rewards.addAll(items));
-            if (FishingHookLogic.startMinigame(player)) {
+            if (FishingHookLogic.startStardewMinigame(player)) {
                 cir.cancel();
             }
         } else {

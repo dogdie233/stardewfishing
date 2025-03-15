@@ -60,7 +60,14 @@ public class FishingHookLogic {
         return entity.getCapability(CapProvider.CAP).map(cap -> cap.rewards);
     }
 
-    public static boolean startMinigame(ServerPlayer player) {
+    /**
+     * Exists for backwards compatibility with Tide.
+     */
+    public static void startMinigame(ServerPlayer player) {
+        startStardewMinigame(player);
+    }
+
+    public static boolean startStardewMinigame(ServerPlayer player) {
         if (player.fishing == null || player instanceof FakePlayer) return false;
 
         player.fishing.getCapability(CapProvider.CAP).resolve().ifPresent(cap -> {

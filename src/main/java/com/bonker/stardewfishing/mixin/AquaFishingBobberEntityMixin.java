@@ -96,7 +96,7 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook implement
                 }
             }
 
-            if (FishingHookLogic.startMinigame(player)) {
+            if (FishingHookLogic.startStardewMinigame(player)) {
                 cir.cancel();
             }
         } else {
