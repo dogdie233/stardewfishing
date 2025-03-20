@@ -10,11 +10,13 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
@@ -37,8 +39,13 @@ public class StardewFishing {
     public static final ResourceLocation TREASURE_CHEST_LOOT = new ResourceLocation(MODID, "treasure_chest");
     public static final ResourceLocation TREASURE_CHEST_NETHER_LOOT = new ResourceLocation(MODID, "treasure_chest_nether");
 
+    public static String MOD_NAME;
+
     public StardewFishing() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        IModInfo info = ModLoadingContext.get().getActiveContainer().getModInfo();
+        MOD_NAME = info.getDisplayName() + " " + info.getVersion();
 
         SFSoundEvents.SOUND_EVENTS.register(bus);
         PULL_ITEM = SFSoundEvents.PULL_ITEM; //TODO remove this, temporary tide fix

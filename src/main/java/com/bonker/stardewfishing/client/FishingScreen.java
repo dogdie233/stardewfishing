@@ -13,16 +13,22 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
+import org.apache.logging.log4j.core.util.internal.Status;
 import org.lwjgl.glfw.GLFW;
 
 public class FishingScreen extends Screen {
     private static final Component TITLE = Component.literal("Fishing Minigame");
     private static final ResourceLocation TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/minigame.png");
+    private static final ResourceLocation NETHER_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/minigame_nether.png");
     private static final ResourceLocation CHEST_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/chest.png");
     private static final ResourceLocation GOLDEN_CHEST_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/golden_chest.png");
 
@@ -77,9 +83,14 @@ public class FishingScreen extends Screen {
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        if (minecraft == null) return;
         partialTick = minecraft.getFrameTime();
 
         PoseStack poseStack = pGuiGraphics.pose();
+        boolean isNether;
+        isNether = minecraft.level != null && minecraft.player != null && minecraft.player.fishing != null &&
+                minecraft.level.getBlockState(BlockPos.containing(minecraft.player.fishing.position())).getFluidState().is(FluidTags.LAVA);
+        ResourceLocation texture = isNether ? NETHER_TEXTURE : TEXTURE;
 
         if (!isPauseScreen()) {
             // render HIT!
@@ -89,7 +100,7 @@ public class FishingScreen extends Screen {
 
             poseStack.pushPose();
             poseStack.scale(scale, scale, 1);
-            RenderUtil.blitF(pGuiGraphics, TEXTURE, x * (1 / scale), y * (1 / scale), 71, 0, HIT_WIDTH, HIT_HEIGHT);
+            RenderUtil.blitF(pGuiGraphics, texture, x * (1 / scale), y * (1 / scale), 71, 0, HIT_WIDTH, HIT_HEIGHT);
             poseStack.popPose();
         } else if (status == Status.CHEST_OPENING) {
             // darken screen
@@ -104,11 +115,11 @@ public class FishingScreen extends Screen {
             RenderUtil.drawWithShake(poseStack, shake, partialTick, status == Status.SUCCESS || status == Status.FAILURE, () -> {
                 RenderUtil.drawWithBlend(() -> {
                     // draw fishing gui
-                    pGuiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, GUI_WIDTH, GUI_HEIGHT);
+                    pGuiGraphics.blit(texture, leftPos, topPos, 0, 0, GUI_WIDTH, GUI_HEIGHT);
 
                     // draw sonar bobber
                     if (minigame.hasSonarBobber()) {
-                        pGuiGraphics.blit(TEXTURE, leftPos + 38, topPos + 2, 185, 0, 26, 25);
+                        pGuiGraphics.blit(texture, leftPos + 38, topPos + 2, 185, 0, 26, 25);
 
                         pGuiGraphics.renderItem(fish, leftPos + 45, topPos + 8);
                         if (pMouseX >= leftPos + 38 && pMouseY >= topPos + 5 && pMouseX <= leftPos + 64 && pMouseY <= topPos + 27) {
@@ -120,9 +131,9 @@ public class FishingScreen extends Screen {
                     RenderUtil.drawWithAlpha(bobberAlpha.getInterpolated(partialTick), () -> {
                         float bobberY = 4 - (minigame.hasCorkBobber() ? 46 : 36) + (142 - bobberPos.getInterpolated(partialTick));
                         if (minigame.hasCorkBobber()) {
-                            RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 18, topPos + bobberY, 38, 36, 9, 46);
+                            RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 36, 9, 46);
                         } else {
-                            RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 18, topPos + bobberY, 38, 0, 9, 36);
+                            RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 36);
                         }
                     });
                 });
@@ -130,7 +141,7 @@ public class FishingScreen extends Screen {
                 RenderUtil.drawWithShake(poseStack, shake, partialTick, minigame.isBobberOnFish() && status == Status.MINIGAME, () -> {
                     // draw fish
                     float fishY = 4 - 16 + (142 - fishPos.getInterpolated(partialTick));
-                    RenderUtil.blitF(pGuiGraphics, TEXTURE, leftPos + 14, topPos + fishY, 55, 0, 16, 15);
+                    RenderUtil.blitF(pGuiGraphics, texture, leftPos + 14, topPos + fishY, 55, 0, 16, 15);
                 });
 
                 if (minigame.isChestVisible() || animationTimer < 0) {
@@ -144,7 +155,7 @@ public class FishingScreen extends Screen {
 
                         RenderUtil.drawWithShake(poseStack, chestShake, partialTick, minigame.isBobberOnChest() && status == Status.MINIGAME, () -> {
                             // draw treasure chest
-                            RenderUtil.blitF(pGuiGraphics, TEXTURE, chestX, chestY, 211, minigame.isGoldenChest() ? 13 : 0, 13, 13);
+                            RenderUtil.blitF(pGuiGraphics, texture, chestX, chestY, 211, minigame.isGoldenChest() ? 13 : 0, 13, 13);
                         });
 
                         // bar bg
@@ -166,7 +177,7 @@ public class FishingScreen extends Screen {
 
                 // draw handle
                 RenderUtil.drawRotatedAround(poseStack, handleRot.getInterpolated(partialTick), leftPos + 6.5F, topPos + 130.5F, () -> {
-                    pGuiGraphics.blit(TEXTURE, leftPos + 5, topPos + 129, 47, 0, 8, 3);
+                    pGuiGraphics.blit(texture, leftPos + 5, topPos + 129, 47, 0, 8, 3);
                 });
 
                 // render PERFECT!
@@ -177,11 +188,13 @@ public class FishingScreen extends Screen {
 
                     poseStack.pushPose();
                     poseStack.scale(scale, scale, 1);
-                    RenderUtil.blitF(pGuiGraphics, TEXTURE, x / scale, y / scale, 144, 0, PERFECT_WIDTH, PERFECT_HEIGHT);
+                    RenderUtil.blitF(pGuiGraphics, texture, x / scale, y / scale, 144, 0, PERFECT_WIDTH, PERFECT_HEIGHT);
                     poseStack.popPose();
                 }
             });
         }
+
+        pGuiGraphics.drawString(font, StardewFishing.MOD_NAME, 2, height - 2 - font.lineHeight, 0x696969);
     }
 
     @Override
