@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -38,6 +39,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,8 +63,9 @@ public class FishingHookLogic {
     }
 
     /**
-     * Exists for backwards compatibility with Tide.
+     * TODO: remove this, Exists for backwards compatibility with Tide.
      */
+    @Deprecated(since = "2.0", forRemoval = true)
     public static void startMinigame(ServerPlayer player) {
         startStardewMinigame(player);
     }
@@ -116,6 +119,7 @@ public class FishingHookLogic {
     }
 
     // todo: added to avoid breaking tide support
+    @Deprecated(since = "2.0", forRemoval = true)
     public static void modifyRewards(List<ItemStack> rewards, double accuracy) {
         modifyRewards(rewards, accuracy, null);
     }
@@ -146,6 +150,7 @@ public class FishingHookLogic {
         if (player.fishing == null) return;
 
         FishingHook hook = player.fishing;
+
         hook.getCapability(CapProvider.CAP).ifPresent(cap -> {
             if (cap.treasureChest && gotChest) {
                 cap.rewards.addAll(getTreasureChestLoot(player.serverLevel(), cap.goldenChest));
@@ -153,6 +158,12 @@ public class FishingHookLogic {
 
             if (cap.rewards.isEmpty()) {
                 hook.discard();
+            }
+
+            if (MinecraftForge.EVENT_BUS.post(new ItemFishedEvent(cap.rewards, 1, hook))) {
+                player.level().playSound(null, player, SFSoundEvents.PULL_ITEM.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                hook.discard();
+                return;
             }
 
             ServerLevel level = player.serverLevel();
