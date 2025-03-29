@@ -53,12 +53,12 @@ public class SFConfig {
                 .defineInRange("biteTimeMultiplier", 0.5, 0, 1);
 
         TREASURE_CHEST_CHANCE = BUILDER
-                .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
-                .defineInRange("biteTimeMultiplier", 0.15, 0, 1);
+                .comment("The chance for finding a treasure chest each time you play the fishing minigame.")
+                .defineInRange("treasureChestChance", 0.15, 0, 1);
 
         GOLDEN_CHEST_CHANCE = BUILDER
-                .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
-                .defineInRange("biteTimeMultiplier", 0.1, 0, 1);
+                .comment("The chance that a treasure chest found in the fishing minigame is a golden chest.")
+                .defineInRange("goldenChestChance", 0.1, 0, 1);
 
         SERVER_SPEC = BUILDER.build();
     }
