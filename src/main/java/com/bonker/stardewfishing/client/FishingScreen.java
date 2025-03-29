@@ -20,9 +20,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoader;
-import org.apache.logging.log4j.core.util.internal.Status;
 import org.lwjgl.glfw.GLFW;
 
 public class FishingScreen extends Screen {
@@ -92,7 +89,7 @@ public class FishingScreen extends Screen {
                 minecraft.level.getBlockState(BlockPos.containing(minecraft.player.fishing.position())).getFluidState().is(FluidTags.LAVA);
         ResourceLocation texture = isNether ? NETHER_TEXTURE : TEXTURE;
 
-        if (!isPauseScreen()) {
+        if (status == Status.HIT_TEXT) {
             // render HIT!
             float scale = textSize.getInterpolated(partialTick) * 1.5F;
             float x = (width - HIT_WIDTH * scale) / 2;
@@ -117,16 +114,6 @@ public class FishingScreen extends Screen {
                     // draw fishing gui
                     pGuiGraphics.blit(texture, leftPos, topPos, 0, 0, GUI_WIDTH, GUI_HEIGHT);
 
-                    // draw sonar bobber
-                    if (minigame.hasSonarBobber()) {
-                        pGuiGraphics.blit(texture, leftPos + 38, topPos + 2, 185, 0, 26, 25);
-
-                        pGuiGraphics.renderItem(fish, leftPos + 45, topPos + 8);
-                        if (pMouseX >= leftPos + 38 && pMouseY >= topPos + 5 && pMouseX <= leftPos + 64 && pMouseY <= topPos + 27) {
-                            pGuiGraphics.renderTooltip(font, AbstractContainerScreen.getTooltipFromItem(minecraft, fish).subList(0, 1), fish.getTooltipImage(), fish, pMouseX, pMouseY);
-                        }
-                    }
-
                     // draw bobber
                     RenderUtil.drawWithAlpha(bobberAlpha.getInterpolated(partialTick), () -> {
                         float bobberY = 4 - (minigame.hasCorkBobber() ? 46 : 36) + (142 - bobberPos.getInterpolated(partialTick));
@@ -137,6 +124,16 @@ public class FishingScreen extends Screen {
                         }
                     });
                 });
+
+                // draw sonar bobber
+                if (minigame.hasSonarBobber()) {
+                    pGuiGraphics.blit(texture, leftPos + 38, topPos + 2, 185, 0, 26, 25);
+
+                    pGuiGraphics.renderItem(fish, leftPos + 45, topPos + 8);
+                    if (pMouseX >= leftPos + 38 && pMouseY >= topPos + 5 && pMouseX <= leftPos + 64 && pMouseY <= topPos + 27) {
+                        pGuiGraphics.renderTooltip(font, AbstractContainerScreen.getTooltipFromItem(minecraft, fish).subList(0, 1), fish.getTooltipImage(), fish, pMouseX, pMouseY);
+                    }
+                }
 
                 RenderUtil.drawWithShake(poseStack, shake, partialTick, minigame.isBobberOnFish() && status == Status.MINIGAME, () -> {
                     // draw fish
@@ -194,7 +191,9 @@ public class FishingScreen extends Screen {
             });
         }
 
-        pGuiGraphics.drawString(font, StardewFishing.MOD_NAME, 2, height - 2 - font.lineHeight, 0x696969);
+        if (status != Status.HIT_TEXT) {
+            pGuiGraphics.drawString(font, StardewFishing.MOD_NAME, 2, height - 2 - font.lineHeight, 0x6969697F);
+        }
     }
 
     @Override
@@ -364,13 +363,13 @@ public class FishingScreen extends Screen {
         animationTimer = 20;
         textSize.reset(0.0F);
 
-        progressBar.freeze(partialTick);
-        bobberPos.freeze(partialTick);
-        bobberAlpha.freeze(partialTick);
-        fishPos.freeze(partialTick);
-        handleRot.freeze(partialTick);
-        chestProgress.freeze(partialTick);
-        chestAppear.freeze(partialTick);
+        progressBar.freeze();
+        bobberPos.freeze();
+        bobberAlpha.freeze();
+        fishPos.freeze();
+        handleRot.freeze();
+        chestProgress.freeze();
+        chestAppear.freeze();
 
         playSound(success ? SFSoundEvents.COMPLETE.get() : SFSoundEvents.FISH_ESCAPE.get());
         stopReelingSounds();

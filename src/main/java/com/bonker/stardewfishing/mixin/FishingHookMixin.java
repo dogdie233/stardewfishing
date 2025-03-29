@@ -44,7 +44,7 @@ public abstract class FishingHookMixin extends Entity implements FishingHookAcce
             setTimeUntilLured(time);
         }
 
-        if (FishingHookLogic.getStoredRewards(hook).isEmpty()) {
+        if (FishingHookLogic.getStoredRewards(hook).map(list -> !list.isEmpty()).orElse(false)) {
             ci.cancel();
         }
     }
