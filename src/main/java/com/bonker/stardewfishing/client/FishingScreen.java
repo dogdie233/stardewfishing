@@ -62,7 +62,6 @@ public class FishingScreen extends Screen {
     private final Animation handleRot = new Animation(0);
     private final Animation chestProgress = new Animation(0);
     private final Animation chestAppear = new Animation(0);
-    private final Animation namePos = new Animation(0);
 
     private final Shake shake = new Shake(0.75F, 1);
     private final Shake chestShake = new Shake(0.75F, 1);
@@ -230,7 +229,6 @@ public class FishingScreen extends Screen {
 
                 boolean onFish = minigame.isBobberOnFish();
 
-                namePos.addValue(0.2F, 0, 1);
                 progressBar.setValue(minigame.getProgress());
                 bobberPos.setValue(minigame.getBobberPos());
                 bobberAlpha.addValue((onFish || minigame.isBobberOnChest()) ? ALPHA_PER_TICK : -ALPHA_PER_TICK, 0.4F, 1);
@@ -353,7 +351,7 @@ public class FishingScreen extends Screen {
 
     @Override
     public boolean isPauseScreen() {
-        return status != Status.HIT_TEXT && false;
+        return status != Status.HIT_TEXT;
     }
 
     public void setResult(boolean success, double accuracy, boolean gotChest, boolean goldenChest) {
