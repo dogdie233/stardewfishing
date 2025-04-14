@@ -20,6 +20,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import org.lwjgl.glfw.GLFW;
 
 public class FishingScreen extends Screen {
@@ -53,6 +55,7 @@ public class FishingScreen extends Screen {
     private int animationTimer = 0;
     private boolean gotChest = false;
     private boolean goldenChest = false;
+    private FluidState bobberFluid = Fluids.EMPTY.defaultFluidState();
 
     private final Animation textSize = new Animation(0);
     private final Animation progressBar;
@@ -84,10 +87,14 @@ public class FishingScreen extends Screen {
         partialTick = minecraft.getFrameTime();
 
         PoseStack poseStack = pGuiGraphics.pose();
-        boolean isNether;
-        isNether = minecraft.level != null && minecraft.player != null && minecraft.player.fishing != null &&
-                minecraft.level.getBlockState(BlockPos.containing(minecraft.player.fishing.position())).getFluidState().is(FluidTags.LAVA);
-        ResourceLocation texture = isNether ? NETHER_TEXTURE : TEXTURE;
+        if (bobberFluid.isEmpty() && minecraft.level != null && minecraft.player != null && minecraft.player.fishing != null) {
+            BlockPos pos = BlockPos.containing(minecraft.player.fishing.position());
+            bobberFluid = minecraft.level.getBlockState(pos).getFluidState();
+            if (bobberFluid.isEmpty()) {
+                bobberFluid = minecraft.level.getBlockState(pos.below()).getFluidState();
+            }
+        }
+        ResourceLocation texture = bobberFluid.is(FluidTags.LAVA) ? NETHER_TEXTURE : TEXTURE;
 
         if (status == Status.HIT_TEXT) {
             // render HIT!
