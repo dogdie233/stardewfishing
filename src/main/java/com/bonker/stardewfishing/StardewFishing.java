@@ -1,5 +1,6 @@
 package com.bonker.stardewfishing;
 
+import com.bonker.stardewfishing.common.init.SFAttributes;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFLootPoolEntryTypes;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
@@ -50,6 +51,7 @@ public class StardewFishing {
         SFSoundEvents.SOUND_EVENTS.register(bus);
         PULL_ITEM = SFSoundEvents.PULL_ITEM; //TODO remove this, temporary tide fix
         SFLootPoolEntryTypes.LOOT_POOL_ENTRY_TYPES.register(bus);
+        SFAttributes.ATTRIBUTES.register(bus);
 
         if (BOBBER_ITEMS_REGISTERED) {
             SFItems.ITEMS.register(bus);

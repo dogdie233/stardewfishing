@@ -1,6 +1,6 @@
 package com.bonker.stardewfishing.mixin;
 
-import com.bonker.stardewfishing.common.init.SFItems;
+import com.bonker.stardewfishing.common.items.SFBobberItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ArmorDyeRecipe;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +15,7 @@ public abstract class ArmorDyeRecipeMixin {
     @Redirect(method = "matches(Lnet/minecraft/world/inventory/CraftingContainer;Lnet/minecraft/world/level/Level;)Z",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
     private boolean stardewFishing_isEmpty(ItemStack instance) {
-        if (instance.getItem() instanceof SFItems.BobberItem) {
+        if (instance.getItem() instanceof SFBobberItem) {
             return true;
         }
         return instance.isEmpty();

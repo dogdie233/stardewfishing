@@ -47,7 +47,7 @@ public abstract class LavaFishingBobberEntityMixin extends FishingHook {
             timeUntilLured -= lureSpeed * 20 * 5;
 
             // apply configurable reduction
-            timeUntilLured = Math.max(1, (int) (timeUntilLured * SFConfig.getBiteTimeMultiplier()));
+            timeUntilLured = Math.max(10, (int) (timeUntilLured * SFConfig.getBiteTimeMultiplier()));
         }
 
         if (FishingHookLogic.getStoredRewards(this).isEmpty()) {

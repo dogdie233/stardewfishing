@@ -52,7 +52,7 @@ public abstract class AquaFishingBobberEntityMixin extends FishingHook implement
             time -= getLureSpeed() * 20 * 5;
 
             // apply configurable reduction
-            time = Math.max(1, (int) (time * SFConfig.getBiteTimeMultiplier()));
+            time = Math.max(10, (int) (time * SFConfig.getBiteTimeMultiplier()));
 
             setTimeUntilLured(time);
         }

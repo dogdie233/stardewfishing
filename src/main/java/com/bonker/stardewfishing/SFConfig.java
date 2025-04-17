@@ -1,5 +1,8 @@
 package com.bonker.stardewfishing;
 
+import com.bonker.stardewfishing.common.init.SFAttributes;
+import com.bonker.stardewfishing.server.AttributeCache;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.common.Mod;
 
@@ -14,7 +17,10 @@ public class SFConfig {
     private static final ForgeConfigSpec.DoubleValue QUALITY_1_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_2_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue QUALITY_3_MULTIPLIER;
-    private static final ForgeConfigSpec.DoubleValue QUALITY_BOBBER_MULTIPLIER;
+    private static final ForgeConfigSpec.DoubleValue TRAP_BOBBER_LINE_STRENGTH;
+    private static final ForgeConfigSpec.IntValue CORK_BOBBER_BAR_SIZE;
+    private static final ForgeConfigSpec.DoubleValue TREASURE_BOBBER_TREASURE_CHANCE;
+    private static final ForgeConfigSpec.DoubleValue QUALITY_BOBBER_EXP_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue BITE_TIME_MULTIPLIER;
     private static final ForgeConfigSpec.DoubleValue TREASURE_CHEST_CHANCE;
     private static final ForgeConfigSpec.DoubleValue GOLDEN_CHEST_CHANCE;
@@ -44,13 +50,25 @@ public class SFConfig {
                 .comment("The multiplier that is applied to experience gained from fishing a quality 3 reward.")
                 .defineInRange("quality3Multiplier", 4.0, 1, 10);
 
-        QUALITY_BOBBER_MULTIPLIER = BUILDER
-                .comment("The multiplier that is applied to experience gained from fishing with a quality bobber equipped.")
-                .defineInRange("qualityBobberMultiplier", 1.4, 1, 10);
+        TRAP_BOBBER_LINE_STRENGTH = BUILDER
+                .comment("The line strength attribute modifier granted by the Trap Bobber. Fish escape speed with the Trap Bobber is calculated as `1 - trapBobberLineStrength` points per tick.")
+                .defineInRange("trapBobberLineStrength", 0.33, 0, 1);
+
+        CORK_BOBBER_BAR_SIZE = BUILDER
+                .comment("The fishing bar size attribute modifier granted by the Cork Bobber. The Cork Bobber adds corkBobberBarSize pixels to the size of the fishing bar.")
+                .defineInRange("corkBobberBarSize", 10, 0, 100);
+
+        TREASURE_BOBBER_TREASURE_CHANCE = BUILDER
+                .comment("The treasure chance attribute modifier granted by the Treasure Bobber. The Treasure Bobber increases the chance of finding a treasure chest by treasureBobberTreasureChance percent.")
+                .defineInRange("treasureBobberTreasureChance", 0.05, 0, 1);
+
+        QUALITY_BOBBER_EXP_MULTIPLIER = BUILDER
+                .comment("The fishing experience multiplier attribute modifier granted by the Quality Bobber. Fishing experience gained with the Quality Bobber is multiplied by this number.")
+                .defineInRange("qualityBobberExpMultiplier", 1.4, 1, 10);
 
         BITE_TIME_MULTIPLIER = BUILDER
                 .comment("The multiplier that is applied to the time it takes for a fish to bite after casting your rod.")
-                .defineInRange("biteTimeMultiplier", 0.5, 0, 1);
+                .defineInRange("biteTimeMultiplier", 0.8, 0, 1);
 
         TREASURE_CHEST_CHANCE = BUILDER
                 .comment("The chance for finding a treasure chest each time you play the fishing minigame.")
@@ -74,14 +92,33 @@ public class SFConfig {
         return 0;
     }
 
-    public static double getMultiplier(double accuracy, boolean qualityBobber) {
+    public static double getMultiplier(double accuracy, Player player) {
         double multiplier = switch(getQuality(accuracy)) {
             case 3 -> QUALITY_3_MULTIPLIER.get();
             case 2 -> QUALITY_2_MULTIPLIER.get();
             case 1 -> QUALITY_1_MULTIPLIER.get();
             default -> 1;
         };
-        return qualityBobber ? multiplier * QUALITY_BOBBER_MULTIPLIER.get() : multiplier;
+
+        multiplier *= AttributeCache.getAttribute(player, SFAttributes.EXPERIENCE_MULTIPLIER.get());
+
+        return multiplier;
+    }
+
+    public static double getTrapBobberLineStrength() {
+        return TRAP_BOBBER_LINE_STRENGTH.get();
+    }
+
+    public static double getCorkBobberBarSize() {
+        return CORK_BOBBER_BAR_SIZE.get();
+    }
+
+    public static double getTreasureBobberTreasureChance() {
+        return TREASURE_BOBBER_TREASURE_CHANCE.get();
+    }
+
+    public static double getQualityBobberExpMultiplier() {
+        return QUALITY_BOBBER_EXP_MULTIPLIER.get();
     }
 
     public static double getBiteTimeMultiplier() {

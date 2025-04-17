@@ -5,12 +5,12 @@ import com.bonker.stardewfishing.common.FishBehavior;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
+import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.proxy.BobberGetter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Random;
 
@@ -25,11 +25,11 @@ public class FishingMinigame {
     private final Random random = new Random();
     private final FishingScreen screen;
     private final FishBehavior behavior;
+    private final float lineStrength;
+    private final int barSize;
     private final int maxBobberHeight;
 
-    private boolean hasCorkBobber = false;
     private boolean hasSonarBobber = false;
-    private boolean hasTrapBobber = false;
     private boolean hasTreasureBobber = false;
 
     private double bobberPos = 0;
@@ -53,33 +53,28 @@ public class FishingMinigame {
     private float chestTimer = 0;
     private boolean chestVisible = false;
 
-    public FishingMinigame(FishingScreen screen, FishBehavior behavior, boolean treasureChest, boolean goldenChest) {
+    public FishingMinigame(FishingScreen screen, S2CStartMinigamePacket packet, Player player, float lineStrength, int barSize) {
         this.screen = screen;
-        this.behavior = behavior;
-        this.goldenChest = goldenChest;
-        this.chestPos = treasureChest ? (int) (5 + 125 * random.nextFloat()) : 0;
-        this.chestAppearTime = treasureChest ? (int) (20 + 40 * random.nextFloat()) : -1;
+        this.behavior = packet.behavior();
+        this.goldenChest = packet.goldenChest();
+        this.chestPos = packet.treasureChest() ? (int) (5 + 125 * random.nextFloat()) : 0;
+        this.chestAppearTime = packet.treasureChest() ? (int) (20 + 40 * random.nextFloat()) : -1;
+        this.lineStrength = lineStrength;
+        this.barSize = barSize;
+        this.maxBobberHeight = 142 - barSize;
 
-        // set bobber flags
-        Player player = Minecraft.getInstance().player;
-        if (StardewFishing.BOBBER_ITEMS_REGISTERED && player != null) {
+        if (StardewFishing.BOBBER_ITEMS_REGISTERED) {
             InteractionHand hand = FishingHookLogic.getRodHand(player);
             if (hand != null) {
-                Item bobberItem = BobberGetter.getBobber(player.getItemInHand(hand)).getItem();
-                if (bobberItem == SFItems.CORK_BOBBER.get()) {
-                    hasCorkBobber = true;
-                } else if (bobberItem == SFItems.SONAR_BOBBER.get()) {
+                ItemStack bobber = BobberGetter.getBobber(player.getItemInHand(hand));
+
+                if (bobber.is(SFItems.SONAR_BOBBER.get())) {
                     hasSonarBobber = true;
-                } else if (bobberItem == SFItems.TRAP_BOBBER.get()) {
-                    hasTrapBobber = true;
-                } else if (bobberItem == SFItems.TREASURE_BOBBER.get()) {
+                } else if (bobber.is(SFItems.TREASURE_BOBBER.get())) {
                     hasTreasureBobber = true;
                 }
             }
         }
-
-        // set max bobber height
-        maxBobberHeight = hasCorkBobber ? 96 : 106;
     }
 
     public void tick(boolean mouseDown) {
@@ -148,7 +143,7 @@ public class FishingMinigame {
 
         // game logic
         int min = Mth.floor(bobberPos) - 2;
-        int max = Mth.ceil(bobberPos) + (hasCorkBobber ? 34 : 24);
+        int max = Mth.ceil(bobberPos) + barSize - 12;
         boolean wasOnFish = bobberOnFish;
         boolean wasOnChest = bobberOnChest;
         bobberOnFish = fishPos >= min && fishPos <= max;
@@ -182,7 +177,7 @@ public class FishingMinigame {
                 screen.setResult(true, (double) successTicks / totalTicks, gotChest(), isGoldenChest());
             }
         } else if (!hasTreasureBobber || !bobberOnChest) {
-            points -= hasTrapBobber ? 0.666F : 1;
+            points -= 1 - lineStrength;
             if (points <= 0) {
                 screen.setResult(false, 0, false, false);
             }
@@ -229,11 +224,11 @@ public class FishingMinigame {
         return chestTimer >= TREASURE_CHEST_TIME;
     }
 
-    public boolean hasCorkBobber() {
-        return hasCorkBobber;
-    }
-
     public boolean hasSonarBobber() {
         return hasSonarBobber;
+    }
+
+    public int getBarSize() {
+        return barSize;
     }
 }

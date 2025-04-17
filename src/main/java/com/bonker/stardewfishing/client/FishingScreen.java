@@ -9,6 +9,7 @@ import com.bonker.stardewfishing.common.networking.C2SCompleteMinigamePacket;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -23,6 +24,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Objects;
 
 public class FishingScreen extends Screen {
     private static final Component TITLE = Component.literal("Fishing Minigame");
@@ -46,9 +49,10 @@ public class FishingScreen extends Screen {
     private static final int REEL_SLOW_LENGTH = 20;
     private static final int CREAK_LENGTH = 6;
 
-    private int leftPos, topPos;
     private final FishingMinigame minigame;
     private final ItemStack fish;
+
+    private int leftPos, topPos;
     private Status status = Status.HIT_TEXT;
     private double accuracy = -1;
     private boolean mouseDown = false;
@@ -76,7 +80,7 @@ public class FishingScreen extends Screen {
 
     public FishingScreen(S2CStartMinigamePacket packet) {
         super(TITLE);
-        this.minigame = new FishingMinigame(this, packet.behavior(), packet.treasureChest(), packet.goldenChest());
+        this.minigame = new FishingMinigame(this, packet, Objects.requireNonNull(Minecraft.getInstance().player), packet.lineStrength(), packet.barSize());
         this.fish = packet.fish();
         this.progressBar = new Animation(minigame.getProgress());
     }
@@ -123,12 +127,14 @@ public class FishingScreen extends Screen {
 
                     // draw bobber
                     RenderUtil.drawWithAlpha(bobberAlpha.getInterpolated(partialTick), () -> {
-                        float bobberY = 4 - (minigame.hasCorkBobber() ? 46 : 36) + (142 - bobberPos.getInterpolated(partialTick));
-                        if (minigame.hasCorkBobber()) {
-                            RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 36, 9, 46);
-                        } else {
-                            RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 36);
+                        float bobberY = 4 - minigame.getBarSize() + (142 - bobberPos.getInterpolated(partialTick));
+                        RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 2);
+                        int i = 0;
+                        while (i < minigame.getBarSize() - 4) {
+                            RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2 + i, 38, 2, 9, 2);
+                            i += 2;
                         }
+                        RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2 + i, 38, 4, 9, 2);
                     });
                 });
 

@@ -3,6 +3,7 @@ package com.bonker.stardewfishing.common.networking;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.proxy.AquacultureProxy;
+import com.bonker.stardewfishing.proxy.TideProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -46,8 +47,10 @@ public record C2SCompleteMinigamePacket(boolean success, double accuracy, boolea
                 FishingHookLogic.endMinigame(player, success, accuracy, gotChest, fishingRod);
                 fishingRod.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
 
-                if (StardewFishing.AQUACULTURE_INSTALLED) {
+                if (StardewFishing.AQUACULTURE_INSTALLED && AquacultureProxy.isAquaRod(fishingRod)) {
                     AquacultureProxy.damageEquippedBobber(fishingRod, player);
+                } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideRod(fishingRod)) {
+                    TideProxy.damageEquippedBobber(fishingRod, player);
                 }
             }
         });

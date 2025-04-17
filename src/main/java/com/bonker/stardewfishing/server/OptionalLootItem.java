@@ -1,4 +1,4 @@
-package com.bonker.stardewfishing.common;
+package com.bonker.stardewfishing.server;
 
 import com.bonker.stardewfishing.common.init.SFLootPoolEntryTypes;
 import com.google.gson.JsonDeserializationContext;

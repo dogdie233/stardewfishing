@@ -1,7 +1,7 @@
 package com.bonker.stardewfishing.common.init;
 
 import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.common.OptionalLootItem;
+import com.bonker.stardewfishing.server.OptionalLootItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraftforge.registries.DeferredRegister;

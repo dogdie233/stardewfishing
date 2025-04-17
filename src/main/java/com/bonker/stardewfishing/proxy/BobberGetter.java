@@ -7,7 +7,7 @@ public class BobberGetter {
     public static ItemStack getBobber(ItemStack fishingRod) {
         if (StardewFishing.AQUACULTURE_INSTALLED && AquacultureProxy.isAquaRod(fishingRod)) {
             return AquacultureProxy.getBobber(fishingRod);
-        } else if (StardewFishing.TIDE_INSTALLED) {
+        } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideRod(fishingRod)) {
             return TideProxy.getBobber(fishingRod);
         } else {
             return ItemStack.EMPTY;
