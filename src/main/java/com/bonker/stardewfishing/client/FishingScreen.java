@@ -29,10 +29,10 @@ import java.util.Objects;
 
 public class FishingScreen extends Screen {
     private static final Component TITLE = Component.literal("Fishing Minigame");
-    private static final ResourceLocation TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/minigame.png");
-    private static final ResourceLocation NETHER_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/minigame_nether.png");
-    private static final ResourceLocation CHEST_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/chest.png");
-    private static final ResourceLocation GOLDEN_CHEST_TEXTURE = new ResourceLocation(StardewFishing.MODID, "textures/gui/golden_chest.png");
+    private static final ResourceLocation TEXTURE = StardewFishing.resource("textures/gui/minigame.png");
+    private static final ResourceLocation NETHER_TEXTURE = StardewFishing.resource("textures/gui/minigame_nether.png");
+    private static final ResourceLocation CHEST_TEXTURE = StardewFishing.resource("textures/gui/chest.png");
+    private static final ResourceLocation GOLDEN_CHEST_TEXTURE = StardewFishing.resource("textures/gui/golden_chest.png");
 
     private static final int GUI_WIDTH = 38;
     private static final int GUI_HEIGHT = 152;

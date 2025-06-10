@@ -20,7 +20,7 @@ public class SFNetworking {
 
     public static void register() {
         CHANNEL = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(StardewFishing.MODID, "packets"))
+                .named(StardewFishing.resource("packets"))
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .clientAcceptedVersions(PROTOCOL_VERSION::equals)
                 .serverAcceptedVersions(PROTOCOL_VERSION::equals)

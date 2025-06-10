@@ -25,6 +25,6 @@ public class SFSoundEvents {
     public static final RegistryObject<SoundEvent> CHEST_GET = registerSound("chest_get");
 
     private static RegistryObject<SoundEvent> registerSound(String name) {
-        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(StardewFishing.MODID, name)));
+        return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(StardewFishing.resource(name)));
     }
 }

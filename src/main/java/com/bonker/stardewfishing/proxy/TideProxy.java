@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.Nullable;
 
 public class TideProxy {
-    public static final ResourceLocation DEFAULT_BOBBER_TEXTURE = new ResourceLocation("tide", "textures/item/white_fishing_bobber.png");
+    public static final ResourceLocation DEFAULT_BOBBER_TEXTURE = ResourceLocation.fromNamespaceAndPath("tide", "textures/item/white_fishing_bobber.png");
 
     public static void damageEquippedBobber(ItemStack fishingRod, ServerPlayer player) {
         if (!CustomRodManager.hasBobber(fishingRod)) {

@@ -69,14 +69,6 @@ public class FishingHookLogic {
         return entity.getCapability(CapProvider.CAP).map(cap -> cap.rewards);
     }
 
-    /**
-     * TODO: remove this, Exists for backwards compatibility with Tide.
-     */
-    @Deprecated(since = "2.0", forRemoval = true)
-    public static void startMinigame(ServerPlayer player) {
-        startStardewMinigame(player);
-    }
-
     public static boolean startStardewMinigame(ServerPlayer player) {
         if (player.fishing == null || player instanceof FakePlayer) return false;
 
@@ -119,12 +111,6 @@ public class FishingHookLogic {
     public static void modifyRewards(ServerPlayer player, double accuracy, @Nullable ItemStack fishingRod) {
         if (player.fishing == null) return;
         getStoredRewards(player.fishing).ifPresent(rewards -> modifyRewards(rewards, accuracy, fishingRod));
-    }
-
-    // todo: added to avoid breaking tide support
-    @Deprecated(since = "2.0", forRemoval = true)
-    public static void modifyRewards(List<ItemStack> rewards, double accuracy) {
-        modifyRewards(rewards, accuracy, null);
     }
 
     public static void modifyRewards(List<ItemStack> rewards, double accuracy, @Nullable ItemStack fishingRod) {
@@ -264,7 +250,7 @@ public class FishingHookLogic {
 
     private static class CapProvider implements ICapabilityProvider {
         private static final Capability<FishingHookLogic> CAP = CapabilityManager.get(new CapabilityToken<>() {});
-        private static final ResourceLocation NAME = new ResourceLocation(StardewFishing.MODID, "hook");
+        private static final ResourceLocation NAME = StardewFishing.resource("hook");
 
         private final LazyOptional<FishingHookLogic> optional = LazyOptional.of(FishingHookLogic::new);
 

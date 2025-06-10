@@ -73,7 +73,7 @@ public class OptionalLootItem extends LootPoolSingletonContainer {
         }
 
         protected OptionalLootItem deserialize(JsonObject json, JsonDeserializationContext context, int weight, int quality, LootItemCondition[] conditions, LootItemFunction[] functions) {
-            ResourceLocation itemId = new ResourceLocation(GsonHelper.getAsString(json, "name"));
+            ResourceLocation itemId = ResourceLocation.parse(GsonHelper.getAsString(json, "name"));
             return new OptionalLootItem(itemId, weight, quality, conditions, functions);
         }
     }
