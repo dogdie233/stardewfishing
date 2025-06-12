@@ -125,17 +125,17 @@ public class RenderUtil {
         return new Divisor(pTarget, i);
     }
 
-    public static void blitRepeatingD(GuiGraphics guiGraphics, ResourceLocation texture, double x, double y, int uOffset, int vOffset, int uWidth, int vHeight, int sourceWidth, int sourceHeight) {
-        int i;
-        for (IntIterator intiterator = slices(uWidth, sourceWidth); intiterator.hasNext(); x += i) {
-            i = intiterator.nextInt();
-            int du = (sourceWidth - i) / 2;
+    public static void blitRepeatingF(GuiGraphics guiGraphics, ResourceLocation texture, float x, float y, int uOffset, int vOffset, int uWidth, int vHeight, int sourceWidth, int sourceHeight) {
+        int width;
+        for (IntIterator intiterator = slices(uWidth, sourceWidth); intiterator.hasNext(); x += width) {
+            width = intiterator.nextInt();
+            int du = (sourceWidth - width) / 2;
 
-            int j;
-            for(IntIterator iterator = slices(vHeight, sourceHeight); iterator.hasNext(); y += j) {
-                j = iterator.nextInt();
-                int dv = (sourceHeight - j) / 2;
-                blitD(guiGraphics, texture, x, y, uOffset + du, vOffset + dv, i, j);
+            int height;
+            for(IntIterator iterator = slices(vHeight, sourceHeight); iterator.hasNext(); y += height) {
+                height = iterator.nextInt();
+                int dv = (sourceHeight - height) / 2;
+                blitF(guiGraphics, texture, x, y, uOffset + du, vOffset + dv, width, height);
             }
         }
     }

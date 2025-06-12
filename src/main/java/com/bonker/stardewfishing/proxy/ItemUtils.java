@@ -25,7 +25,7 @@ public class ItemUtils {
         } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideRod(stack)) {
             return true;
         } else {
-            return stack.getItem() instanceof FishingRodItem;
+            return stack.is(StardewFishing.MODIFIABLE_RODS);
         }
     }
 

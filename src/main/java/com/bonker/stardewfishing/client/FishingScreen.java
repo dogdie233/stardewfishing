@@ -14,15 +14,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
@@ -51,6 +47,7 @@ public class FishingScreen extends Screen {
 
     private final FishingMinigame minigame;
     private final ItemStack fish;
+    private final boolean lava;
 
     private int leftPos, topPos;
     private Status status = Status.HIT_TEXT;
@@ -59,11 +56,10 @@ public class FishingScreen extends Screen {
     private int animationTimer = 0;
     private boolean gotChest = false;
     private boolean goldenChest = false;
-    private FluidState bobberFluid = Fluids.EMPTY.defaultFluidState();
 
     private final Animation textSize = new Animation(0);
     private final Animation progressBar;
-    private final Animation.Double bobberPos = new Animation.Double(0);
+    private final Animation bobberPos = new Animation(0);
     private final Animation bobberAlpha = new Animation(1);
     private final Animation fishPos = new Animation(0);
     private final Animation handleRot = new Animation(0);
@@ -83,6 +79,7 @@ public class FishingScreen extends Screen {
         this.minigame = new FishingMinigame(this, packet, Objects.requireNonNull(Minecraft.getInstance().player), packet.lineStrength(), packet.barSize());
         this.fish = packet.fish();
         this.progressBar = new Animation(minigame.getProgress());
+        this.lava = packet.lava();
     }
 
     @Override
@@ -91,14 +88,7 @@ public class FishingScreen extends Screen {
         partialTick = minecraft.getFrameTime();
 
         PoseStack poseStack = pGuiGraphics.pose();
-        if (bobberFluid.isEmpty() && minecraft.level != null && minecraft.player != null && minecraft.player.fishing != null) {
-            BlockPos pos = BlockPos.containing(minecraft.player.fishing.position());
-            bobberFluid = minecraft.level.getBlockState(pos).getFluidState();
-            if (bobberFluid.isEmpty()) {
-                bobberFluid = minecraft.level.getBlockState(pos.below()).getFluidState();
-            }
-        }
-        ResourceLocation texture = bobberFluid.is(FluidTags.LAVA) ? NETHER_TEXTURE : TEXTURE;
+        ResourceLocation texture = lava ? NETHER_TEXTURE : TEXTURE;
 
         if (status == Status.HIT_TEXT) {
             // render HIT!
@@ -128,11 +118,13 @@ public class FishingScreen extends Screen {
                     // draw bobber
                     RenderUtil.drawWithAlpha(bobberAlpha.getInterpolated(partialTick), () -> {
                         int size = minigame.getBarSize();
-                        double bobberY = 4 - size + (142 - bobberPos.getInterpolated(partialTick));
+                        float bobberY = 4 - size + (142 - bobberPos.getInterpolated(partialTick));
+                        // clamp decimal part to multiples of 0.1 to prevent floating point visual artifacts
+                        bobberY = (int) (bobberY * 10) / 10F;
 
-                        RenderUtil.blitD(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 2);
-                        RenderUtil.blitRepeatingD(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2, 38, 2, 9, size - 4, 9, 1);
-                        RenderUtil.blitD(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + size - 2, 38, 3, 9, 2);
+                        RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 2);
+                        RenderUtil.blitRepeatingF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2, 38, 2, 9, size - 4, 9, 1);
+                        RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + size - 2, 38, 3, 9, 2);
                     });
                 });
 

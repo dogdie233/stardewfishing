@@ -12,6 +12,7 @@ import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.AttributeCache;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,6 +34,7 @@ import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -57,7 +59,9 @@ import java.util.function.Supplier;
 
 public class FishingHookLogic {
     private final ArrayList<ItemStack> rewards = new ArrayList<>();
-    private boolean treasureChest = false, goldenChest = false;
+    private boolean treasureChest = false;
+    private boolean goldenChest = false;
+    private boolean lava = false;
 
     public static void attachCap(AttachCapabilitiesEvent<Entity> event) {
         if (!event.getObject().getCapability(FishingHookLogic.CapProvider.CAP).isPresent()) {
@@ -87,9 +91,17 @@ public class FishingHookLogic {
                 }
             }
 
+            BlockPos pos = BlockPos.containing(player.fishing.position());
+            FluidState fluid = player.level().getBlockState(pos).getFluidState();
+            if (fluid.isEmpty()) {
+                fluid = player.level().getBlockState(pos.below()).getFluidState();
+            }
+            cap.lava = fluid.is(FluidTags.LAVA);
+
             AttributeCache.add(player);
             SFNetworking.sendToPlayer(player, new S2CStartMinigamePacket(FishBehaviorReloadListener.getBehavior(fish), fish, cap.treasureChest, cap.goldenChest,
-                    (float) AttributeCache.getAttribute(player, SFAttributes.LINE_STRENGTH.get()), (int) AttributeCache.getAttribute(player, SFAttributes.BAR_SIZE.get())));
+                    (float) AttributeCache.getAttribute(player, SFAttributes.LINE_STRENGTH.get()), (int) AttributeCache.getAttribute(player, SFAttributes.BAR_SIZE.get()),
+                    cap.lava));
         });
 
         return true;
@@ -162,7 +174,7 @@ public class FishingHookLogic {
                 }
 
                 ItemEntity itementity;
-                if (level.getFluidState(hook.blockPosition()).is(FluidTags.LAVA)) {
+                if (cap.lava) {
                     itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward) {
                         public boolean displayFireAnimation() {
                             return false;
