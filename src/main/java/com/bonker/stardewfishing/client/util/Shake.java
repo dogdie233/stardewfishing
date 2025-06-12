@@ -1,18 +1,12 @@
 package com.bonker.stardewfishing.client.util;
 
-import net.minecraft.util.Mth;
-
-import java.util.Random;
-
 public class Shake {
-    private final Random random = new Random();
+    private final Animation xAnim = new Animation(0);
+    private final Animation yAnim = new Animation(0);
 
     private float strength;
-    private float strengthSqr;
     private int interval;
 
-    private float lastX = 0, lastY = 0;
-    private float x = 0, y = 0;
     private int timer = 0;
 
     public Shake(float strength, int interval) {
@@ -21,7 +15,6 @@ public class Shake {
 
     public void setValues(float strength, int interval) {
         this.strength = strength;
-        this.strengthSqr = (strength * 0.5F) * (strength * 0.5F);
         this.interval = interval;
     }
 
@@ -29,25 +22,16 @@ public class Shake {
         if (++timer >= interval) {
             timer = 0;
 
-            lastX = x;
-            lastY = y;
-
-            while (distSqr() < strengthSqr) {
-                x = Mth.clamp(lastX + random.nextFloat(-strength, strength), -strength, strength);
-                y = Mth.clamp(lastY + random.nextFloat(-strength, strength), -strength, strength);
-            }
+            xAnim.setValue((float) (Math.random() * strength * 2 + -strength));
+            yAnim.setValue((float) (Math.random() * strength * 2 + -strength));
         }
     }
 
     public float getXOffset(float partialTick) {
-        return lastX + partialTick * (x - lastX) * ((float) timer / interval);
+        return xAnim.getInterpolated((timer + partialTick) / interval);
     }
 
     public float getYOffset(float partialTick) {
-        return lastY + partialTick * (y - lastX) * ((float) timer / interval);
-    }
-
-    private float distSqr() {
-        return (x - lastX) * (x - lastX) + (y - lastY) * (y - lastY);
+        return yAnim.getInterpolated((timer + partialTick) / interval);
     }
 }

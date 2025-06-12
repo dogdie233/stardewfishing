@@ -17,6 +17,8 @@
   "item.stardew_fishing.treasure_bobber.tooltip": "Fish don't escape while collecting treasures. Also slightly increases the chance to find treasures",
   "item.stardew_fishing.quality_bobber.tooltip": "Greatly increases experience gained from fishing",
   "item.stardew_fishing.quality_bobber.quality_food_tooltip": "Also boosts the Quality of fish that you catch",
+  "item.stardew_fishing.bobber.tooltip": "Bobber: %s",
+  "item.stardew_fishing.no_bobber.tooltip": "No bobber (right click to attach)",
   "stardew_fishing.bobber_broke": "Your %s broke!",
   "item.modifiers.stardew_fishing.fishing_rod": "When Equipped to Rod:",
   "attribute.name.stardew_fishing.line_strength": "Fishing Line Strength",

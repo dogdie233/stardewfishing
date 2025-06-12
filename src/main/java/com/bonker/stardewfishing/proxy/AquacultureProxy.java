@@ -1,6 +1,7 @@
 package com.bonker.stardewfishing.proxy;
 
 import com.bonker.stardewfishing.common.FishingHookLogic;
+import com.teammetallurgy.aquaculture.api.AquacultureAPI;
 import com.teammetallurgy.aquaculture.item.AquaFishingRodItem;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -19,5 +20,13 @@ public class AquacultureProxy {
 
     public static boolean isAquaRod(ItemStack fishingRod) {
         return fishingRod.getItem() instanceof AquaFishingRodItem;
+    }
+
+    public static boolean isAquaBobber(ItemStack stack) {
+        return stack.is(AquacultureAPI.Tags.BOBBER);
+    }
+
+    public static void setBobber(ItemStack fishingRod, ItemStack bobber) {
+        AquaFishingRodItem.getHandler(fishingRod).setStackInSlot(3, bobber);
     }
 }

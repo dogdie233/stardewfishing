@@ -7,7 +7,7 @@ import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
-import com.bonker.stardewfishing.proxy.BobberGetter;
+import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.AttributeCache;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
@@ -229,10 +229,10 @@ public class FishingHookLogic {
     }
 
     public static boolean hasBobber(@Nullable ItemStack fishingRod, Supplier<Item> itemSupplier) {
-        if (!StardewFishing.BOBBER_ITEMS_REGISTERED || fishingRod == null) {
+        if (fishingRod == null) {
             return false;
         }
-        return BobberGetter.getBobber(fishingRod).is(itemSupplier.get());
+        return ItemUtils.getBobber(fishingRod).is(itemSupplier.get());
     }
 
     public static Optional<ItemStack> damageBobber(ItemStack bobber, ServerPlayer player) {

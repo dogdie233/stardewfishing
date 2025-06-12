@@ -1,11 +1,9 @@
 package com.bonker.stardewfishing.common.items;
 
-import com.bonker.stardewfishing.proxy.TideProxy;
+import com.bonker.stardewfishing.StardewFishing;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.DyeableLeatherItem;
@@ -15,6 +13,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -35,17 +34,9 @@ public class SFBobberItem extends Item implements DyeableLeatherItem, AttributeA
     }
 
     protected List<Component> makeTooltip() {
-        return List.of(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
-    }
-
-    // called by tide
-    public ResourceLocation getTextureLocation() {
-        return TideProxy.DEFAULT_BOBBER_TEXTURE;
-    }
-
-    // called by tide
-    public Component getTranslation() {
-        return getDescription();
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.translatable(getDescriptionId() + ".tooltip").withStyle(StardewFishing.LIGHT_COLOR));
+        return tooltip;
     }
 
     @Override

@@ -34,12 +34,9 @@ public class SFItems {
             modifiers -> modifiers.put(SFAttributes.EXPERIENCE_MULTIPLIER.get(), new AttributeModifier("Quality bobber exp multiplier", SFConfig.getQualityBobberExpMultiplier() - 1, AttributeModifier.Operation.MULTIPLY_TOTAL))) {
         @Override
         protected List<Component> makeTooltip() {
-            ImmutableList.Builder<Component> builder = new ImmutableList.Builder<>();
-            builder.add(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
-            if (StardewFishing.QUALITY_FOOD_INSTALLED) {
-                builder.add(Component.translatable(getDescriptionId() + ".quality_food_tooltip").withStyle(ChatFormatting.GRAY));
-            }
-            return builder.build();
+            List<Component> tooltip = super.makeTooltip();
+            tooltip.add(1, Component.translatable(getDescriptionId() + ".quality_food_tooltip").withStyle(StardewFishing.LIGHT_COLOR));
+            return tooltip;
         }
     });
 

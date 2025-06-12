@@ -14,6 +14,21 @@
       "stardew_fishing:dwop"
     ]
   },
+  "dwop_reverse": {
+    "sounds": [
+      "stardew_fishing:dwop_reverse"
+    ]
+  },
+  "equip": {
+    "sounds": [
+      "stardew_fishing:equip"
+    ]
+  },
+  "unequip": {
+    "sounds": [
+      "stardew_fishing:unequip"
+    ]
+  },
   "fish_bite": {
     "sounds": [
       "stardew_fishing:fish_bite"

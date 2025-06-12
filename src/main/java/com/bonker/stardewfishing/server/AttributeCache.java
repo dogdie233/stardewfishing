@@ -1,17 +1,17 @@
 package com.bonker.stardewfishing.server;
 
 import com.bonker.stardewfishing.common.items.AttributeAttachmentItem;
-import com.bonker.stardewfishing.proxy.BobberGetter;
+import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.google.common.collect.Multimap;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.ItemStack;
 import oshi.util.tuples.Pair;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,24 +27,32 @@ public class AttributeCache {
     }
 
     public static void add(Player player) {
-        ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!(stack.getItem() instanceof FishingRodItem)) {
-            stack = player.getItemInHand(InteractionHand.OFF_HAND);
+        ItemStack fishingRod = player.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!ItemUtils.isFishingRod(fishingRod)) {
+            fishingRod = player.getItemInHand(InteractionHand.OFF_HAND);
         }
 
-        ItemStack bobber = BobberGetter.getBobber(stack);
-
+        ItemStack bobber = ItemUtils.getBobber(fishingRod);
         if (bobber.getItem() instanceof AttributeAttachmentItem) {
-            Multimap<Attribute, AttributeModifier> itemModifiers = AttributeAttachmentItem.getAttachmentModifiers(bobber);
-            AttributeMap playerAttributes = player.getAttributes();
+            add(player, fishingRod, AttributeAttachmentItem.getAttachmentModifiers(bobber));
+        } else {
+            add(player, fishingRod, null);
+        }
+    }
 
-            playerAttributes.addTransientAttributeModifiers(itemModifiers);
+    private static void add(Player player, ItemStack fishingRod, @Nullable Multimap<Attribute, AttributeModifier> bobberModifiers) {
+        AttributeMap playerAttributes = player.getAttributes();
 
-            Map<Attribute, Double> cache = new HashMap<>();
-            playerAttributes.attributes.forEach((attribute, inst) -> cache.put(attribute, inst.getValue()));
-            CACHE_MAP.put(player, new Pair<>(stack, cache));
+        if (bobberModifiers != null) {
+            playerAttributes.addTransientAttributeModifiers(bobberModifiers);
+        }
 
-            playerAttributes.removeAttributeModifiers(itemModifiers);
+        Map<Attribute, Double> cache = new HashMap<>();
+        playerAttributes.attributes.forEach((attribute, inst) -> cache.put(attribute, inst.getValue()));
+        CACHE_MAP.put(player, new Pair<>(fishingRod, cache));
+
+        if (bobberModifiers != null) {
+            playerAttributes.removeAttributeModifiers(bobberModifiers);
         }
     }
 

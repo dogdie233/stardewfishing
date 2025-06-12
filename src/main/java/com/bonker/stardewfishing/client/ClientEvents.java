@@ -3,18 +3,39 @@ package com.bonker.stardewfishing.client;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.client.event.sound.PlaySoundSourceEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 public class ClientEvents {
     @Mod.EventBusSubscriber(modid = StardewFishing.MODID, value = Dist.CLIENT)
     public static class ForgeBus {
+        @SubscribeEvent
+        public static void onClientTick(final TickEvent.ClientTickEvent event) {
+            if (event.phase != TickEvent.Phase.START) {
+                return;
+            }
+
+            if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> containerScreen) {
+                RodTooltipHandler.tick(containerScreen.hoveredSlot, containerScreen.getMenu().getCarried());
+            } else {
+                RodTooltipHandler.clear();
+            }
+        }
+
+        @SubscribeEvent
+        public static void onScreenRendered(final ContainerScreenEvent.Render.Foreground event) {
+            RodTooltipHandler.render(event.getGuiGraphics(), Minecraft.getInstance().getPartialTick(), event.getMouseX() - event.getContainerScreen().getGuiLeft(), event.getMouseY() - event.getContainerScreen().getGuiTop());
+        }
+
         @SubscribeEvent
         public static void onSoundPlayed(final PlaySoundSourceEvent event) {
             try {

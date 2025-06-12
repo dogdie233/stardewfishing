@@ -13,6 +13,9 @@ public class SFSoundEvents {
     public static final RegistryObject<SoundEvent> CAST = registerSound("cast");
     public static final RegistryObject<SoundEvent> COMPLETE = registerSound("complete");
     public static final RegistryObject<SoundEvent> DWOP = registerSound("dwop");
+    public static final RegistryObject<SoundEvent> DWOP_REVERSE = registerSound("dwop_reverse");
+    public static final RegistryObject<SoundEvent> EQUIP = registerSound("equip");
+    public static final RegistryObject<SoundEvent> UNEQUIP = registerSound("unequip");
     public static final RegistryObject<SoundEvent> FISH_ESCAPE = registerSound("fish_escape");
     public static final RegistryObject<SoundEvent> FISH_BITE = registerSound("fish_bite");
     public static final RegistryObject<SoundEvent> FISH_HIT = registerSound("fish_hit");

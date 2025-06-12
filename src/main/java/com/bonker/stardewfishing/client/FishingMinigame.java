@@ -6,7 +6,7 @@ import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
-import com.bonker.stardewfishing.proxy.BobberGetter;
+import com.bonker.stardewfishing.proxy.ItemUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -63,16 +63,14 @@ public class FishingMinigame {
         this.barSize = barSize;
         this.maxBobberHeight = 142 - barSize;
 
-        if (StardewFishing.BOBBER_ITEMS_REGISTERED) {
-            InteractionHand hand = FishingHookLogic.getRodHand(player);
-            if (hand != null) {
-                ItemStack bobber = BobberGetter.getBobber(player.getItemInHand(hand));
+        InteractionHand hand = FishingHookLogic.getRodHand(player);
+        if (hand != null) {
+            ItemStack bobber = ItemUtils.getBobber(player.getItemInHand(hand));
 
-                if (bobber.is(SFItems.SONAR_BOBBER.get())) {
-                    hasSonarBobber = true;
-                } else if (bobber.is(SFItems.TREASURE_BOBBER.get())) {
-                    hasTreasureBobber = true;
-                }
+            if (bobber.is(SFItems.SONAR_BOBBER.get())) {
+                hasSonarBobber = true;
+            } else if (bobber.is(SFItems.TREASURE_BOBBER.get())) {
+                hasTreasureBobber = true;
             }
         }
     }

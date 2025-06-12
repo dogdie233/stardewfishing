@@ -39,4 +39,44 @@ public class Animation {
         lastValue = value;
         this.value = value;
     }
+
+    // floats are not precise enough for using repeating blit
+    public static class Double {
+        private double lastValue;
+        private double value;
+        private boolean frozen = false;
+
+        public Double(double value) {
+            this.lastValue = value;
+            this.value = value;
+        }
+
+        public void setValue(double value) {
+            this.lastValue = this.value;
+            this.value = value;
+        }
+
+        public void addValue(double addition) {
+            setValue(value + addition);
+        }
+
+        public void addValue(double addition, double min, double max) {
+            setValue(Mth.clamp(value + addition, min, max));
+        }
+
+        public double getInterpolated(double partialTick) {
+            if (frozen) return value;
+            return Mth.lerp(partialTick, lastValue, value);
+        }
+
+        public void freeze() {
+            frozen = true;
+            lastValue = value;
+        }
+
+        public void reset(double value) {
+            lastValue = value;
+            this.value = value;
+        }
+    }
 }

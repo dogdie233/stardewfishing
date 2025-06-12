@@ -63,7 +63,7 @@ public class FishingScreen extends Screen {
 
     private final Animation textSize = new Animation(0);
     private final Animation progressBar;
-    private final Animation bobberPos = new Animation(0);
+    private final Animation.Double bobberPos = new Animation.Double(0);
     private final Animation bobberAlpha = new Animation(1);
     private final Animation fishPos = new Animation(0);
     private final Animation handleRot = new Animation(0);
@@ -127,14 +127,12 @@ public class FishingScreen extends Screen {
 
                     // draw bobber
                     RenderUtil.drawWithAlpha(bobberAlpha.getInterpolated(partialTick), () -> {
-                        float bobberY = 4 - minigame.getBarSize() + (142 - bobberPos.getInterpolated(partialTick));
-                        RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 2);
-                        int i = 0;
-                        while (i < minigame.getBarSize() - 4) {
-                            RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2 + i, 38, 2, 9, 2);
-                            i += 2;
-                        }
-                        RenderUtil.blitF(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2 + i, 38, 4, 9, 2);
+                        int size = minigame.getBarSize();
+                        double bobberY = 4 - size + (142 - bobberPos.getInterpolated(partialTick));
+
+                        RenderUtil.blitD(pGuiGraphics, texture, leftPos + 18, topPos + bobberY, 38, 0, 9, 2);
+                        RenderUtil.blitRepeatingD(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + 2, 38, 2, 9, size - 4, 9, 1);
+                        RenderUtil.blitD(pGuiGraphics, texture, leftPos + 18, topPos + bobberY + size - 2, 38, 3, 9, 2);
                     });
                 });
 
