@@ -1,11 +1,9 @@
 package com.bonker.stardewfishing.proxy;
 
 import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.common.items.SFBobberItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.ItemStack;
 
 public class ItemUtils {
@@ -35,7 +33,7 @@ public class ItemUtils {
         } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideBobber(stack)) {
             return true;
         } else {
-            return stack.getItem() instanceof SFBobberItem;
+            return stack.is(StardewFishing.BOBBERS);
         }
     }
 

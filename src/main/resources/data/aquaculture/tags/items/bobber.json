@@ -1,25 +1,6 @@
 {
   "replace": false,
   "values": [
-    {
-      "id": "stardew_fishing:trap_bobber",
-      "required": false
-    },
-    {
-      "id": "stardew_fishing:cork_bobber",
-      "required": false
-    },
-    {
-      "id": "stardew_fishing:sonar_bobber",
-      "required": false
-    },
-    {
-      "id": "stardew_fishing:treasure_bobber",
-      "required": false
-    },
-    {
-      "id": "stardew_fishing:quality_bobber",
-      "required": false
-    }
+    "#stardew_fishing:bobbers"
   ]
 }
