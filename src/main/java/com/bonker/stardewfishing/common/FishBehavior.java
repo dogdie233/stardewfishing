@@ -2,7 +2,6 @@ package com.bonker.stardewfishing.common;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 
 import java.util.Random;
@@ -18,19 +17,6 @@ public record FishBehavior(int idleTime, float topSpeed, float upAcceleration, f
     ).apply(inst, FishBehavior::new));
 
     public static final int MAX_HEIGHT = 127;
-
-    public FishBehavior(FriendlyByteBuf buf) {
-        this(buf.readVarInt(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readVarInt(), buf.readVarInt());
-    }
-
-    public void writeToBuffer(FriendlyByteBuf buf) {
-        buf.writeVarInt(idleTime);
-        buf.writeFloat(topSpeed);
-        buf.writeFloat(upAcceleration);
-        buf.writeFloat(downAcceleration);
-        buf.writeVarInt(avgDistance);
-        buf.writeVarInt(moveVariation);
-    }
 
     public boolean shouldMoveNow(int idleTicks, Random random) {
         if (idleTime == 0) return true;

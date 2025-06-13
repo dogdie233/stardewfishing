@@ -1,20 +1,34 @@
 package com.bonker.stardewfishing.common.networking;
 
-import com.bonker.stardewfishing.common.FishBehavior;
 import com.bonker.stardewfishing.proxy.ClientProxy;
+import com.bonker.stardewfishing.server.event.StardewMinigameStartedEvent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public record S2CStartMinigamePacket(FishBehavior behavior, ItemStack fish, boolean treasureChest, boolean goldenChest, float lineStrength, int barSize, boolean lava) {
+public record S2CStartMinigamePacket(int idleTime, float topSpeed, float upAcceleration, float downAcceleration,
+                                     int avgDistance, int moveVariation, ItemStack fish, boolean treasureChest,
+                                     boolean goldenChest, float lineStrength, int barSize, boolean lava) {
+    public S2CStartMinigamePacket(StardewMinigameStartedEvent event, boolean treasureChest, boolean goldenChest) {
+        this(event.getIdleTime(), event.getTopSpeed(), event.getUpAcceleration(), event.getDownAcceleration(),
+                event.getAvgDistance(), event.getMoveVariation(), event.getFish(), treasureChest, goldenChest,
+                (float) event.getLineStrength(), event.getBarSize(), event.isLavaFishing());
+    }
+
     public S2CStartMinigamePacket(FriendlyByteBuf buf) {
-        this(new FishBehavior(buf), buf.readItem(), buf.readBoolean(), buf.readBoolean(), buf.readFloat(), buf.readShort(), buf.readBoolean());
+        this(buf.readShort(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readShort(), buf.readShort(),
+                buf.readItem(), buf.readBoolean(), buf.readBoolean(), buf.readFloat(), buf.readShort(), buf.readBoolean());
     }
 
     public void encode(FriendlyByteBuf buf) {
-        behavior.writeToBuffer(buf);
+        buf.writeShort(idleTime);
+        buf.writeFloat(topSpeed);
+        buf.writeFloat(upAcceleration);
+        buf.writeFloat(downAcceleration);
+        buf.writeShort(avgDistance);
+        buf.writeShort(moveVariation);
         buf.writeItem(fish);
         buf.writeBoolean(treasureChest);
         buf.writeBoolean(goldenChest);

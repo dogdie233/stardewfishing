@@ -2,7 +2,6 @@ package com.bonker.stardewfishing.common;
 
 import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.common.init.SFAttributes;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
@@ -11,6 +10,9 @@ import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.AttributeCache;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
+import com.bonker.stardewfishing.server.event.StardewMinigameEndedEvent;
+import com.bonker.stardewfishing.server.event.StardewMinigameModifyRewardsEvent;
+import com.bonker.stardewfishing.server.event.StardewMinigameStartedEvent;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -58,7 +60,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class FishingHookLogic {
-    private final ArrayList<ItemStack> rewards = new ArrayList<>();
+    public final ArrayList<ItemStack> rewards = new ArrayList<>();
     private boolean treasureChest = false;
     private boolean goldenChest = false;
     private boolean lava = false;
@@ -76,19 +78,16 @@ public class FishingHookLogic {
     public static boolean startStardewMinigame(ServerPlayer player) {
         if (player.fishing == null || player instanceof FakePlayer) return false;
 
-        player.fishing.getCapability(CapProvider.CAP).resolve().ifPresent(cap -> {
+        return player.fishing.getCapability(CapProvider.CAP).resolve().map(cap -> {
             ItemStack fish = cap.rewards.stream()
                     .filter(stack -> stack.is(StardewFishing.STARTS_MINIGAME))
                     .findFirst()
                     .orElseThrow();
 
-            double chestChance = SFConfig.getTreasureChestChance() + AttributeCache.getAttribute(player, SFAttributes.TREASURE_CHANCE_BONUS.get());
-
-            if (player.getRandom().nextFloat() < chestChance) {
-                cap.treasureChest = true;
-                if (player.getRandom().nextFloat() < SFConfig.getGoldenChestChance()) {
-                    cap.goldenChest = true;
-                }
+            InteractionHand rodHand = getRodHand(player);
+            if (rodHand == null) {
+                StardewFishing.LOGGER.warn("{} tried to start a minigame without a fishing rod", player.getScoreboardName());
+                return false;
             }
 
             BlockPos pos = BlockPos.containing(player.fishing.position());
@@ -96,21 +95,39 @@ public class FishingHookLogic {
             if (fluid.isEmpty()) {
                 fluid = player.level().getBlockState(pos.below()).getFluidState();
             }
-            cap.lava = fluid.is(FluidTags.LAVA);
 
             AttributeCache.add(player);
-            SFNetworking.sendToPlayer(player, new S2CStartMinigamePacket(FishBehaviorReloadListener.getBehavior(fish), fish, cap.treasureChest, cap.goldenChest,
-                    (float) AttributeCache.getAttribute(player, SFAttributes.LINE_STRENGTH.get()), (int) AttributeCache.getAttribute(player, SFAttributes.BAR_SIZE.get()),
-                    cap.lava));
-        });
+            StardewMinigameStartedEvent startEvent = new StardewMinigameStartedEvent(player, player.fishing, player.getItemInHand(rodHand), fish, FishBehaviorReloadListener.getBehavior(fish), fluid.is(FluidTags.LAVA));
+            MinecraftForge.EVENT_BUS.post(startEvent);
 
-        return true;
+            cap.lava = startEvent.isLavaFishing();
+
+            double chestChance = SFConfig.getTreasureChestChance() + startEvent.getTreasureChanceBonus();
+            if (startEvent.isForcedTreasureChest() || player.getRandom().nextFloat() < chestChance) {
+                cap.treasureChest = true;
+                if (startEvent.isForcedGoldenChest() || player.getRandom().nextFloat() < SFConfig.getGoldenChestChance()) {
+                    cap.goldenChest = true;
+                }
+            }
+
+            SFNetworking.sendToPlayer(player, new S2CStartMinigamePacket(startEvent, cap.treasureChest, cap.goldenChest));
+            return true;
+        }).orElse(false);
     }
 
-    public static void endMinigame(Player player, boolean success, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
-        if (success && !player.level().isClientSide) {
-            modifyRewards((ServerPlayer) player, accuracy, fishingRod);
-            giveRewards((ServerPlayer) player, accuracy, gotChest);
+    public static void endMinigame(ServerPlayer player, boolean success, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
+        if (player.fishing == null) {
+            return;
+        }
+
+        StardewMinigameEndedEvent endEvent = new StardewMinigameEndedEvent(player, player.fishing, fishingRod, success, accuracy, gotChest);
+        if (fishingRod != null) {
+            MinecraftForge.EVENT_BUS.post(endEvent);
+        }
+
+        if (endEvent.wasSuccessful() && !player.level().isClientSide) {
+            modifyRewards(player, endEvent.getAccuracy(), fishingRod);
+            giveRewards(player, endEvent.getAccuracy(), endEvent.gotChest(), fishingRod);
         }
 
         if (player.fishing != null) {
@@ -147,7 +164,7 @@ public class FishingHookLogic {
         }
     }
 
-    public static void giveRewards(ServerPlayer player, double accuracy, boolean gotChest) {
+    public static void giveRewards(ServerPlayer player, double accuracy, boolean gotChest, ItemStack fishingRod) {
         if (player.fishing == null) return;
 
         FishingHook hook = player.fishing;
@@ -156,6 +173,9 @@ public class FishingHookLogic {
             if (cap.treasureChest && gotChest) {
                 cap.rewards.addAll(getTreasureChestLoot(player.serverLevel(), cap.goldenChest));
             }
+
+            StardewMinigameModifyRewardsEvent modifyRewardsEvent = new StardewMinigameModifyRewardsEvent(player, hook, fishingRod, cap.rewards);
+            MinecraftForge.EVENT_BUS.post(modifyRewardsEvent);
 
             if (cap.rewards.isEmpty()) {
                 hook.discard();
@@ -196,7 +216,7 @@ public class FishingHookLogic {
                 int exp = (int) ((player.getRandom().nextInt(6) + 1) * SFConfig.getMultiplier(accuracy, player));
                 level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, exp));
 
-                InteractionHand hand = FishingHookLogic.getRodHand(player);
+                InteractionHand hand = getRodHand(player);
                 ItemStack handItem = hand != null ? player.getItemInHand(hand) : ItemStack.EMPTY;
                 CriteriaTriggers.FISHING_ROD_HOOKED.trigger(player, handItem, hook, cap.rewards);
             }
@@ -260,8 +280,8 @@ public class FishingHookLogic {
         return Optional.of(bobber);
     }
 
-    private static class CapProvider implements ICapabilityProvider {
-        private static final Capability<FishingHookLogic> CAP = CapabilityManager.get(new CapabilityToken<>() {});
+    public static class CapProvider implements ICapabilityProvider {
+        public static final Capability<FishingHookLogic> CAP = CapabilityManager.get(new CapabilityToken<>() {});
         private static final ResourceLocation NAME = StardewFishing.resource("hook");
 
         private final LazyOptional<FishingHookLogic> optional = LazyOptional.of(FishingHookLogic::new);

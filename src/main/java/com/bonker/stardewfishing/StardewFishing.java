@@ -31,7 +31,7 @@ public class StardewFishing {
 
     public static final TagKey<Item> STARTS_MINIGAME = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), resource("starts_minigame"));
     public static final TagKey<Item> MODIFIABLE_RODS = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), resource("modifiable_rods"));
-    public static final TagKey<Item> BOBBERS = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), resource("bobberes"));
+    public static final TagKey<Item> BOBBERS = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), resource("bobbers"));
 
     public static final ResourceLocation TREASURE_CHEST_LOOT = resource("treasure_chest");
     public static final ResourceLocation TREASURE_CHEST_NETHER_LOOT = resource("treasure_chest_nether");

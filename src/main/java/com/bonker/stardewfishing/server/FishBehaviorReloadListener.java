@@ -15,14 +15,13 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class FishBehaviorReloadListener extends SimplePreparableReloadListener<Map<String, JsonObject>> {
     private static final Gson GSON_INSTANCE = new Gson();
@@ -30,11 +29,8 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
     private static FishBehaviorReloadListener INSTANCE;
 
     private final Map<Item, FishBehavior> fishBehaviors = new HashMap<>();
+    private final List<ResourceLocation> keys = new ArrayList<>();
     private FishBehavior defaultBehavior;
-
-    private FishBehaviorReloadListener() {
-        super();
-    }
 
     @Override
     protected Map<String, JsonObject> prepare(ResourceManager pResourceManager, ProfilerFiller pProfiler) {
@@ -59,16 +55,21 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
                     .ifPresent(behaviorList -> {
                         behaviorList.behaviors.forEach((loc, fishBehavior) -> {
                             Item item = ForgeRegistries.ITEMS.getValue(loc);
-                            if (item != null) {
+                            if (item != Items.AIR) {
                                 if (behaviorList.replace || !fishBehaviors.containsKey(item)) {
                                     fishBehaviors.put(item, fishBehavior);
+                                    keys.add(loc);
                                 }
 
-                                behaviorList.defaultBehavior.ifPresent(behavior -> defaultBehavior = behavior);
+                                if (behaviorList.replace || defaultBehavior == null) {
+                                    behaviorList.defaultBehavior.ifPresent(behavior -> defaultBehavior = behavior);
+                                }
                             }
                         });
                     });
         }
+
+        Collections.sort(keys);
     }
 
     public static FishBehaviorReloadListener create() {
@@ -79,6 +80,10 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
     public static FishBehavior getBehavior(@Nullable ItemStack stack) {
         if (stack == null) return INSTANCE.defaultBehavior;
         return INSTANCE.fishBehaviors.getOrDefault(stack.getItem(), INSTANCE.defaultBehavior);
+    }
+
+    public static List<ResourceLocation> getKeys() {
+        return INSTANCE.keys;
     }
 
     private record FishBehaviorList(boolean replace, Map<ResourceLocation, FishBehavior> behaviors, Optional<FishBehavior> defaultBehavior) {

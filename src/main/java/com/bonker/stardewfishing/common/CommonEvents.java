@@ -3,11 +3,11 @@ package com.bonker.stardewfishing.common;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.RodTooltipHandler;
 import com.bonker.stardewfishing.common.init.SFAttributes;
-import com.bonker.stardewfishing.proxy.ClientProxy;
 import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
+import com.bonker.stardewfishing.server.SFCommands;
+import com.bonker.stardewfishing.server.event.StardewMinigameStartedEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemStackedOnOtherEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,6 +26,11 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class CommonEvents {
     @Mod.EventBusSubscriber(modid = StardewFishing.MODID)
     public static class ForgeBus {
+        @SubscribeEvent
+        public static void onRegisterCommands(final RegisterCommandsEvent event) {
+            SFCommands.register(event.getDispatcher(), event.getBuildContext());
+        }
+
         @SubscribeEvent
         public static void onItemStackedOnOther(final ItemStackedOnOtherEvent event) {
             if (event.getClickAction() != ClickAction.SECONDARY) {
