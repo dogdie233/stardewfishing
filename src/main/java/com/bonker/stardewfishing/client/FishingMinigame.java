@@ -1,7 +1,5 @@
 package com.bonker.stardewfishing.client;
 
-import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.common.FishBehavior;
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
@@ -20,11 +18,11 @@ public class FishingMinigame {
 
     private static final float UP_ACCELERATION = 0.7F;
     private static final float GRAVITY = -0.7F;
-    private static final int MAX_FISH_HEIGHT = FishBehavior.MAX_HEIGHT;
+    private static final int MAX_FISH_HEIGHT = 127;
 
     private final Random random = new Random();
     private final FishingScreen screen;
-    private final FishBehavior behavior;
+    private final S2CStartMinigamePacket packet;
     private final float lineStrength;
     private final int barSize;
     private final int maxBobberHeight;
@@ -55,7 +53,7 @@ public class FishingMinigame {
 
     public FishingMinigame(FishingScreen screen, S2CStartMinigamePacket packet, Player player, float lineStrength, int barSize) {
         this.screen = screen;
-        this.behavior = packet.behavior();
+        this.packet = packet;
         this.goldenChest = packet.goldenChest();
         this.chestPos = packet.treasureChest() ? (int) (5 + 125 * random.nextFloat()) : 0;
         this.chestAppearTime = packet.treasureChest() ? (int) (20 + 40 * random.nextFloat()) : -1;
@@ -100,8 +98,8 @@ public class FishingMinigame {
         }
 
         // fish movement
-        if (fishTarget == -1 || behavior.shouldMoveNow(fishIdleTicks, random)) {
-            fishTarget = behavior.pickNextTargetPos((int) fishPos, random);
+        if (fishTarget == -1 || shouldMoveNow(fishIdleTicks, random)) {
+            fishTarget = pickNextTargetPos((int) fishPos, random);
             fishIsIdle = false;
             fishIdleTicks = 0;
         }
@@ -110,15 +108,15 @@ public class FishingMinigame {
             fishIdleTicks++;
             if (Math.abs(fishVelocity) > 0) {
                 boolean up = fishVelocity > 0;
-                fishVelocity -= (up ? behavior.upAcceleration() : behavior.downAcceleration()) * Math.signum(fishVelocity);
+                fishVelocity -= (up ? packet.upAcceleration() : packet.downAcceleration()) * Math.signum(fishVelocity);
                 if (fishVelocity == 0 || up && fishVelocity < 0 || !up && fishVelocity > 0) {
                     fishVelocity = 0;
                 }
             }
         } else {
             double distanceLeft = fishTarget - fishPos;
-            double acceleration = (distanceLeft > 0 ? behavior.upAcceleration() : behavior.downAcceleration()) * Math.signum(distanceLeft);
-            fishVelocity = Mth.clamp(fishVelocity + acceleration, -behavior.topSpeed(), behavior.topSpeed());
+            double acceleration = (distanceLeft > 0 ? packet.upAcceleration() : packet.downAcceleration()) * Math.signum(distanceLeft);
+            fishVelocity = Mth.clamp(fishVelocity + acceleration, -packet.topSpeed(), packet.topSpeed());
         }
 
         fishPos += fishVelocity;
@@ -180,6 +178,42 @@ public class FishingMinigame {
                 screen.setResult(false, 0, false, false);
             }
         }
+    }
+
+    private boolean shouldMoveNow(int idleTicks, Random random) {
+        if (packet.idleTime() == 0) return true;
+        if (packet.idleTime() == 1) return idleTicks == 1;
+
+        int variation = idleTicks / 2;
+        float chancePerTick = 1F / variation;
+
+        if (idleTicks >= packet.idleTime() - variation) {
+            return random.nextFloat() <= chancePerTick;
+        }
+
+        return false;
+    }
+
+    private int pickNextTargetPos(int oldPos, Random random) {
+        int shortestDistance = packet.avgDistance() - packet.moveVariation();
+        int longestDistance = packet.avgDistance() + packet.moveVariation();
+
+        int downLowerLimit = oldPos - shortestDistance;
+        int upLowerLimit = oldPos + shortestDistance;
+
+        boolean canGoDown = downLowerLimit >= 0;
+        boolean canGoUp = upLowerLimit <= MAX_FISH_HEIGHT;
+
+        boolean goingUp;
+        if (canGoUp && canGoDown) {
+            goingUp = random.nextBoolean();
+        } else {
+            goingUp = canGoUp;
+        }
+
+        int distance = random.nextInt(shortestDistance, longestDistance + 1);
+
+        return Mth.clamp(oldPos + distance * (goingUp ? 1 : -1), 0, MAX_FISH_HEIGHT);
     }
 
     public float getBobberPos() {

@@ -6,6 +6,7 @@ import com.bonker.stardewfishing.server.AttributeCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class StardewMinigameStartedEvent extends StardewMinigameEvent {
     private final ItemStack fish;
@@ -22,6 +23,7 @@ public class StardewMinigameStartedEvent extends StardewMinigameEvent {
     private boolean forcedTreasureChest = false;
     private boolean forcedGoldenChest = false;
     private boolean lavaFishing;
+    private int qualityBoost = 0;
 
     public StardewMinigameStartedEvent(ServerPlayer player, FishingHook hook, ItemStack fishingRod,
                                        ItemStack fish, FishBehavior behavior, boolean lavaFishing) {
@@ -38,6 +40,10 @@ public class StardewMinigameStartedEvent extends StardewMinigameEvent {
         this.treasureChanceBonus = AttributeCache.getAttribute(player, SFAttributes.TREASURE_CHANCE_BONUS.get());
         this.expMultiplier = AttributeCache.getAttribute(player, SFAttributes.EXPERIENCE_MULTIPLIER.get());
         this.lavaFishing = lavaFishing;
+
+        // according to the minecraft wiki, each level of luck of the sea grants a 2.1% higher chance of treasure
+        float luckBonus = EnchantmentHelper.getFishingLuckBonus(fishingRod) * 0.021F;
+        this.treasureChanceBonus += luckBonus;
     }
 
     public ItemStack getFish() {
@@ -146,5 +152,13 @@ public class StardewMinigameStartedEvent extends StardewMinigameEvent {
 
     public void setLavaFishing(boolean lavaFishing) {
         this.lavaFishing = lavaFishing;
+    }
+
+    public int getQualityBoost() {
+        return qualityBoost;
+    }
+
+    public void setQualityBoost(int qualityBoost) {
+        this.qualityBoost = qualityBoost;
     }
 }

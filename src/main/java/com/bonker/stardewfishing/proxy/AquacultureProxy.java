@@ -2,10 +2,17 @@ package com.bonker.stardewfishing.proxy;
 
 import com.bonker.stardewfishing.common.FishingHookLogic;
 import com.teammetallurgy.aquaculture.api.AquacultureAPI;
+import com.teammetallurgy.aquaculture.api.fishing.Hooks;
+import com.teammetallurgy.aquaculture.entity.AquaFishingBobberEntity;
 import com.teammetallurgy.aquaculture.item.AquaFishingRodItem;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.ItemStackHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AquacultureProxy {
     public static void damageEquippedBobber(ItemStack fishingRod, ServerPlayer player) {
@@ -28,5 +35,31 @@ public class AquacultureProxy {
 
     public static void setBobber(ItemStack fishingRod, ItemStack bobber) {
         AquaFishingRodItem.getHandler(fishingRod).setStackInSlot(3, bobber);
+    }
+
+    public static FishingHook spawnHook(ServerPlayer player, ItemStack fishingRod, Vec3 pos) {
+        AquaFishingBobberEntity hook = new AquaFishingBobberEntity(player, player.level(), 0, 0, Hooks.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, fishingRod) {
+            @Override
+            public void tick() {
+                baseTick();
+            }
+        };
+        hook.setPos(pos);
+        player.level().addFreshEntity(hook);
+        return hook;
+    }
+
+    public static List<ItemStack> getAllModifierItems(ItemStack fishingRod) {
+        List<ItemStack> modifiers = new ArrayList<>();
+        modifiers.add(fishingRod);
+        ItemStack bobber = AquaFishingRodItem.getBobber(fishingRod);
+        ItemStack line = AquaFishingRodItem.getFishingLine(fishingRod);
+        if (!bobber.isEmpty()) {
+            modifiers.add(bobber);
+        }
+        if (!line.isEmpty()) {
+            modifiers.add(line);
+        }
+        return modifiers;
     }
 }

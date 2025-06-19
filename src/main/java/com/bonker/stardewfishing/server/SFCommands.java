@@ -1,6 +1,8 @@
 package com.bonker.stardewfishing.server;
 
 import com.bonker.stardewfishing.common.FishingHookLogic;
+import com.bonker.stardewfishing.proxy.ItemUtils;
+import com.bonker.stardewfishing.server.data.FishBehaviorReloadListener;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.context.CommandContext;
@@ -19,6 +21,7 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -42,24 +45,19 @@ public class SFCommands {
     private static int startMinigame(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
 
-        if (FishingHookLogic.getRodHand(player) == null) {
+        InteractionHand rodHand = FishingHookLogic.getRodHand(player);
+        if (rodHand == null) {
             throw NO_ROD.create();
         }
 
         ItemStack stack = context.getArgument("item", ItemInput.class).createItemStack(1, false);
 
-        FishingHook hook = new FishingHook(player, player.level(), 0, 0) {
-            @Override
-            public void tick() {
-                baseTick();
-            }
-        };
-        hook.setPos(player.position().add(0, 1, 0));
-        player.level().addFreshEntity(hook);
+        FishingHook hook = ItemUtils.spawnHook(player, player.getItemInHand(rodHand), player.position().add(0, 1, 0));
+        player.fishing = hook;
 
-        hook.getCapability(FishingHookLogic.CapProvider.CAP).ifPresent(cap -> {
-            cap.rewards.clear();
-            cap.rewards.add(stack);
+        FishingHookLogic.getStoredRewards(hook).ifPresent(rewards -> {
+            rewards.clear();
+            rewards.add(stack);
         });
 
         FishingHookLogic.startStardewMinigame(context.getSource().getPlayerOrException());

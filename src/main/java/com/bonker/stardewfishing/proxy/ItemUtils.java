@@ -1,10 +1,16 @@
 package com.bonker.stardewfishing.proxy;
 
 import com.bonker.stardewfishing.StardewFishing;
+import com.li64.tide.data.rods.CustomRodManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemUtils {
     public static ItemStack getBobber(ItemStack fishingRod) {
@@ -77,5 +83,39 @@ public class ItemUtils {
 
         modifier.put("bobber", bobber.save(new CompoundTag()));
         nbt.put("modifier", modifier);
+    }
+
+    public static FishingHook spawnHook(ServerPlayer player, ItemStack fishingRod, Vec3 pos) {
+        if (StardewFishing.AQUACULTURE_INSTALLED && AquacultureProxy.isAquaRod(fishingRod)) {
+            return AquacultureProxy.spawnHook(player, fishingRod, pos);
+        } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideRod(fishingRod)) {
+            return TideProxy.spawnHook(player, fishingRod, pos);
+        } else {
+            FishingHook hook = new FishingHook(player, player.level(), 0, 0) {
+                @Override
+                public void tick() {
+                    baseTick();
+                }
+            };
+            hook.setPos(pos);
+            player.level().addFreshEntity(hook);
+            return hook;
+        }
+    }
+
+    public static List<ItemStack> getAllModifierItems(ItemStack fishingRod) {
+        if (StardewFishing.AQUACULTURE_INSTALLED && AquacultureProxy.isAquaRod(fishingRod)) {
+            return AquacultureProxy.getAllModifierItems(fishingRod);
+        } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideRod(fishingRod)) {
+            return TideProxy.getAllModifierItems(fishingRod);
+        } else {
+            List<ItemStack> modifiers = new ArrayList<>();
+            modifiers.add(fishingRod);
+            ItemStack bobber = getBobberNBT(fishingRod);
+            if (!bobber.isEmpty()) {
+                modifiers.add(bobber);
+            }
+            return modifiers;
+        }
     }
 }

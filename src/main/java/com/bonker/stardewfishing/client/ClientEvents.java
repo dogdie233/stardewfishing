@@ -1,5 +1,6 @@
 package com.bonker.stardewfishing.client;
 
+import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,9 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void onScreenRendered(final ContainerScreenEvent.Render.Foreground event) {
-            RodTooltipHandler.render(event.getGuiGraphics(), Minecraft.getInstance().getPartialTick(), event.getMouseX() - event.getContainerScreen().getGuiLeft(), event.getMouseY() - event.getContainerScreen().getGuiTop());
+            if (SFConfig.isInventoryEquippingEnabled()) {
+                RodTooltipHandler.render(event.getGuiGraphics(), Minecraft.getInstance().getPartialTick(), event.getMouseX() - event.getContainerScreen().getGuiLeft(), event.getMouseY() - event.getContainerScreen().getGuiTop());
+            }
         }
 
         @SubscribeEvent

@@ -1,12 +1,14 @@
 package com.bonker.stardewfishing.common;
 
+import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.RodTooltipHandler;
 import com.bonker.stardewfishing.common.init.SFAttributes;
+import com.bonker.stardewfishing.proxy.ClientProxy;
 import com.bonker.stardewfishing.proxy.ItemUtils;
-import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
+import com.bonker.stardewfishing.server.data.FishBehaviorReloadListener;
+import com.bonker.stardewfishing.server.data.MinigameModifiersReloadListener;
 import com.bonker.stardewfishing.server.SFCommands;
-import com.bonker.stardewfishing.server.event.StardewMinigameStartedEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -19,6 +21,7 @@ import net.minecraftforge.event.ItemStackedOnOtherEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -33,6 +36,10 @@ public class CommonEvents {
 
         @SubscribeEvent
         public static void onItemStackedOnOther(final ItemStackedOnOtherEvent event) {
+            if (!SFConfig.isInventoryEquippingEnabled()) {
+                return;
+            }
+
             if (event.getClickAction() != ClickAction.SECONDARY) {
                 return;
             }
@@ -64,19 +71,34 @@ public class CommonEvents {
             }
         }
 
-        @SubscribeEvent
+        @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onTooltip(final ItemTooltipEvent event) {
-            if (!StardewFishing.TIDE_INSTALLED && ItemUtils.isFishingRod(event.getItemStack())) {
-                ItemStack bobber = ItemUtils.getBobber(event.getItemStack());
+            if (ItemUtils.isFishingRod(event.getItemStack())) {
+                if (!StardewFishing.TIDE_INSTALLED) {
+                    ItemStack bobber = ItemUtils.getBobber(event.getItemStack());
 
-                if (bobber.isEmpty()) {
-                    event.getToolTip().add(Component.translatable("item.stardew_fishing.no_bobber.tooltip")
-                            .withStyle(StardewFishing.DARK_COLOR));
-                } else {
-                    event.getToolTip().add(Component.translatable("item.stardew_fishing.bobber.tooltip", bobber.getDisplayName().copy().withStyle(StardewFishing.LIGHT_COLOR))
-                            .withStyle(StardewFishing.DARK_COLOR));
+                    if (bobber.isEmpty()) {
+                        event.getToolTip().add(Component.translatable("tooltip.stardew_fishing." + (SFConfig.isInventoryEquippingEnabled() ? "no_bobber" : "no_bobber_attach_disabled"))
+                                .withStyle(StardewFishing.DARK_COLOR));
+                    } else {
+                        event.getToolTip().add(Component.translatable("tooltip.stardew_fishing.bobber", bobber.getDisplayName().copy().withStyle(StardewFishing.LIGHT_COLOR))
+                                .withStyle(StardewFishing.DARK_COLOR));
+                    }
                 }
             }
+
+            MinigameModifiersReloadListener.getModifiers(event.getItemStack()).ifPresent(modifiers -> {
+                if (!event.getToolTip().get(event.getToolTip().size() - 1).getString().isEmpty()) {
+                    event.getToolTip().add(Component.empty());
+                }
+
+                if (ClientProxy.isShiftDown()) {
+                    event.getToolTip().add(Component.translatable("tooltip.stardew_fishing.rod_modifier").withStyle(StardewFishing.LIGHT_COLOR));
+                    modifiers.appendTooltip(event.getToolTip());
+                } else {
+                    event.getToolTip().add(Component.translatable("tooltip.stardew_fishing.rod_modifier_shift").withStyle(StardewFishing.LIGHT_COLOR));
+                }
+            });
         }
 
         @SubscribeEvent
@@ -89,6 +111,7 @@ public class CommonEvents {
         @SubscribeEvent
         public static void onAddReloadListeners(final AddReloadListenerEvent event) {
             event.addListener(FishBehaviorReloadListener.create());
+            event.addListener(MinigameModifiersReloadListener.create());
         }
     }
 

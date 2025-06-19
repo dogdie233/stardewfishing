@@ -19,23 +19,21 @@ public class SFItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, StardewFishing.MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, StardewFishing.MODID);
 
-    public static final RegistryObject<Item> TRAP_BOBBER = ITEMS.register("trap_bobber", () -> new SFBobberItem(new Item.Properties().durability(64),
-            builder -> builder.put(SFAttributes.LINE_STRENGTH.get(), new AttributeModifier("Trap bobber line strength", SFConfig.getTrapBobberLineStrength(), AttributeModifier.Operation.MULTIPLY_TOTAL))));
+    public static final RegistryObject<Item> TRAP_BOBBER = ITEMS.register("trap_bobber", () -> new SFBobberItem(new Item.Properties().durability(64)));
 
-    public static final RegistryObject<Item> CORK_BOBBER = ITEMS.register("cork_bobber", () -> new SFBobberItem(new Item.Properties().durability(64),
-            modifiers -> modifiers.put(SFAttributes.BAR_SIZE.get(), new AttributeModifier("Cork bobber bar size", SFConfig.getCorkBobberBarSize(), AttributeModifier.Operation.ADDITION))));
+    public static final RegistryObject<Item> CORK_BOBBER = ITEMS.register("cork_bobber", () -> new SFBobberItem(new Item.Properties().durability(64)));
 
     public static final RegistryObject<Item> SONAR_BOBBER = ITEMS.register("sonar_bobber", () -> new SFBobberItem(new Item.Properties().durability(64)));
 
-    public static final RegistryObject<Item> TREASURE_BOBBER = ITEMS.register("treasure_bobber", () -> new SFBobberItem(new Item.Properties().durability(64),
-            builder -> builder.put(SFAttributes.TREASURE_CHANCE_BONUS.get(), new AttributeModifier("Treasure bobber treasure chance", SFConfig.getTreasureBobberTreasureChance(), AttributeModifier.Operation.ADDITION))));
+    public static final RegistryObject<Item> TREASURE_BOBBER = ITEMS.register("treasure_bobber", () -> new SFBobberItem(new Item.Properties().durability(64)));
 
-    public static final RegistryObject<Item> QUALITY_BOBBER = ITEMS.register("quality_bobber", () -> new SFBobberItem(new Item.Properties().durability(64),
-            modifiers -> modifiers.put(SFAttributes.EXPERIENCE_MULTIPLIER.get(), new AttributeModifier("Quality bobber exp multiplier", SFConfig.getQualityBobberExpMultiplier() - 1, AttributeModifier.Operation.MULTIPLY_TOTAL))) {
+    public static final RegistryObject<Item> QUALITY_BOBBER = ITEMS.register("quality_bobber", () -> new SFBobberItem(new Item.Properties().durability(64)) {
         @Override
         protected List<Component> makeTooltip() {
             List<Component> tooltip = super.makeTooltip();
-            tooltip.add(1, Component.translatable(getDescriptionId() + ".quality_food_tooltip").withStyle(StardewFishing.LIGHT_COLOR));
+            if (StardewFishing.QUALITY_FOOD_INSTALLED) {
+                tooltip.add(1, Component.translatable(getDescriptionId() + ".quality_food_tooltip").withStyle(StardewFishing.LIGHTER_COLOR));
+            }
             return tooltip;
         }
     });

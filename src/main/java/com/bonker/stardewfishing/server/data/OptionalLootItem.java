@@ -1,4 +1,4 @@
-package com.bonker.stardewfishing.server;
+package com.bonker.stardewfishing.server.data;
 
 import com.bonker.stardewfishing.common.init.SFLootPoolEntryTypes;
 import com.google.gson.JsonDeserializationContext;
@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntry;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
@@ -35,7 +36,8 @@ public class OptionalLootItem extends LootPoolSingletonContainer {
     protected OptionalLootItem(ResourceLocation itemId, int pWeight, int pQuality, LootItemCondition[] pConditions, LootItemFunction[] pFunctions) {
         super(pWeight, pQuality, pConditions, pFunctions);
         this.itemId = itemId;
-        this.item = ForgeRegistries.ITEMS.getValue(itemId);
+        Item item = ForgeRegistries.ITEMS.getValue(itemId);
+        this.item = item == Items.AIR ? null : item;
         this.compositeFunction = LootItemFunctions.compose(pFunctions);
     }
 

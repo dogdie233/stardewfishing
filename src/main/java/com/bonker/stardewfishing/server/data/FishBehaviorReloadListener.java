@@ -1,4 +1,4 @@
-package com.bonker.stardewfishing.server;
+package com.bonker.stardewfishing.server.data;
 
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.common.FishBehavior;
@@ -16,6 +16,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -25,7 +26,8 @@ import java.util.*;
 
 public class FishBehaviorReloadListener extends SimplePreparableReloadListener<Map<String, JsonObject>> {
     private static final Gson GSON_INSTANCE = new Gson();
-    private static final ResourceLocation LOCATION = StardewFishing.resource("data.json");
+    private static final ResourceLocation LOCATION = StardewFishing.resource("fish_behaviors.json");
+    private static final ResourceLocation OLD_LOCATION = StardewFishing.resource("data.json");
     private static FishBehaviorReloadListener INSTANCE;
 
     private final Map<Item, FishBehavior> fishBehaviors = new HashMap<>();
@@ -44,6 +46,17 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
                 StardewFishing.LOGGER.error("Invalid json in fish behavior list {} in data pack {}", LOCATION, resource.sourcePackId(), exception);
             }
         }
+
+        for (Resource resource : pResourceManager.getResourceStack(OLD_LOCATION)) {
+            try (InputStream inputstream = resource.open();
+                 Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8));
+            ) {
+                StardewFishing.LOGGER.error("Error in datapack {}: Fish behavior list found at stardew_fishing/data.json. As of 3.0, fish behavior has been moved to stardew_fishing/fish_behaviors.json. This file has been loaded, but it will not be in the future.", resource.sourcePackId());
+                objects.put(resource.sourcePackId(), GsonHelper.fromJson(GSON_INSTANCE, reader, JsonObject.class));
+            } catch (RuntimeException | IOException exception) {
+                StardewFishing.LOGGER.error("Invalid json in fish behavior list {} in data pack {}", LOCATION, resource.sourcePackId(), exception);
+            }
+        }
         return objects;
     }
 
@@ -51,11 +64,15 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
     protected void apply(Map<String, JsonObject> jsonObjects, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         for (Map.Entry<String, JsonObject> entry : jsonObjects.entrySet()) {
             FishBehaviorList.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.warn("Failed to decode fish behavior list {} in data pack {} - {}", LOCATION, entry.getKey(), errorMsg))
+                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.warn(makeError(entry.getKey(), errorMsg)))
                     .ifPresent(behaviorList -> {
                         behaviorList.behaviors.forEach((loc, fishBehavior) -> {
                             Item item = ForgeRegistries.ITEMS.getValue(loc);
-                            if (item != Items.AIR) {
+                            if (item == Items.AIR) {
+                                if (ModList.get().isLoaded(loc.getNamespace())) {
+                                    throw new RuntimeException(makeError(entry.getKey(), "Mod '" + loc.getNamespace() + "' present but item not registered: " + loc.getPath()));
+                                }
+                            } else {
                                 if (behaviorList.replace || !fishBehaviors.containsKey(item)) {
                                     fishBehaviors.put(item, fishBehavior);
                                     keys.add(loc);
@@ -70,6 +87,10 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
         }
 
         Collections.sort(keys);
+    }
+
+    private static String makeError(String datapackID, String description) {
+        return "Failed to decode fish behavior list " + LOCATION + " in data pack " + datapackID + " - " + description;
     }
 
     public static FishBehaviorReloadListener create() {

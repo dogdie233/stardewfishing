@@ -2,14 +2,14 @@ package com.bonker.stardewfishing.common;
 
 import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
-import com.bonker.stardewfishing.common.init.SFItems;
 import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.AttributeCache;
-import com.bonker.stardewfishing.server.FishBehaviorReloadListener;
+import com.bonker.stardewfishing.server.data.FishBehaviorReloadListener;
+import com.bonker.stardewfishing.server.data.MinigameModifiersReloadListener;
 import com.bonker.stardewfishing.server.event.StardewMinigameEndedEvent;
 import com.bonker.stardewfishing.server.event.StardewMinigameModifyRewardsEvent;
 import com.bonker.stardewfishing.server.event.StardewMinigameStartedEvent;
@@ -27,14 +27,15 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -57,13 +58,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class FishingHookLogic {
     public final ArrayList<ItemStack> rewards = new ArrayList<>();
     private boolean treasureChest = false;
     private boolean goldenChest = false;
-    private boolean lava = false;
+    public StardewMinigameStartedEvent event = null;
 
     public static void attachCap(AttachCapabilitiesEvent<Entity> event) {
         if (!event.getObject().getCapability(FishingHookLogic.CapProvider.CAP).isPresent()) {
@@ -97,10 +97,18 @@ public class FishingHookLogic {
             }
 
             AttributeCache.add(player);
-            StardewMinigameStartedEvent startEvent = new StardewMinigameStartedEvent(player, player.fishing, player.getItemInHand(rodHand), fish, FishBehaviorReloadListener.getBehavior(fish), fluid.is(FluidTags.LAVA));
+
+            ItemStack fishingRod = player.getItemInHand(rodHand);
+            StardewMinigameStartedEvent startEvent = new StardewMinigameStartedEvent(player, player.fishing, fishingRod, fish, FishBehaviorReloadListener.getBehavior(fish), fluid.is(FluidTags.LAVA));
+
+            ItemUtils.getAllModifierItems(fishingRod).forEach(stack ->
+                    MinigameModifiersReloadListener.getModifiers(stack)
+                            .ifPresent(modifiers -> modifiers.apply(startEvent)));
+
+
             MinecraftForge.EVENT_BUS.post(startEvent);
 
-            cap.lava = startEvent.isLavaFishing();
+            cap.event = startEvent;
 
             double chestChance = SFConfig.getTreasureChestChance() + startEvent.getTreasureChanceBonus();
             if (startEvent.isForcedTreasureChest() || player.getRandom().nextFloat() < chestChance) {
@@ -115,7 +123,7 @@ public class FishingHookLogic {
         }).orElse(false);
     }
 
-    public static void endMinigame(ServerPlayer player, boolean success, double accuracy, boolean gotChest, @Nullable ItemStack fishingRod) {
+    public static void endMinigame(ServerPlayer player, boolean success, double accuracy, boolean gotChest, int qualityBoost, @Nullable ItemStack fishingRod) {
         if (player.fishing == null) {
             return;
         }
@@ -126,7 +134,7 @@ public class FishingHookLogic {
         }
 
         if (endEvent.wasSuccessful() && !player.level().isClientSide) {
-            modifyRewards(player, endEvent.getAccuracy(), fishingRod);
+            modifyRewards(player, endEvent.getAccuracy(), qualityBoost);
             giveRewards(player, endEvent.getAccuracy(), endEvent.gotChest(), fishingRod);
         }
 
@@ -137,17 +145,26 @@ public class FishingHookLogic {
         AttributeCache.remove(player);
     }
 
+    // todo: remove this, exists for backward compatibility with tide
+    @Deprecated(forRemoval = true, since = "3.0")
     public static void modifyRewards(ServerPlayer player, double accuracy, @Nullable ItemStack fishingRod) {
-        if (player.fishing == null) return;
-        getStoredRewards(player.fishing).ifPresent(rewards -> modifyRewards(rewards, accuracy, fishingRod));
+        modifyRewards(player, accuracy, 0);
     }
 
+    // todo: remove this, exists for backward compatibility with tide
+    @Deprecated(forRemoval = true, since = "3.0")
     public static void modifyRewards(List<ItemStack> rewards, double accuracy, @Nullable ItemStack fishingRod) {
+        modifyRewards(rewards, accuracy, 0);
+    }
+
+    public static void modifyRewards(ServerPlayer player, double accuracy, int qualityBoost) {
+        if (player.fishing == null) return;
+        getStoredRewards(player.fishing).ifPresent(rewards -> modifyRewards(rewards, accuracy, qualityBoost));
+    }
+
+    public static void modifyRewards(List<ItemStack> rewards, double accuracy, int qualityBoost) {
         if (StardewFishing.QUALITY_FOOD_INSTALLED) {
-            int quality = SFConfig.getQuality(accuracy);
-            if (quality < 3 && hasBobber(fishingRod, SFItems.QUALITY_BOBBER)) {
-                quality++;
-            }
+            int quality = Mth.clamp(SFConfig.getQuality(accuracy) + qualityBoost, 0, 3);
             for (ItemStack reward : rewards) {
                 if (reward.is(StardewFishing.STARTS_MINIGAME)) {
                     if (quality == 0 && reward.hasTag() && reward.getOrCreateTag().contains("quality_food")) {
@@ -194,7 +211,7 @@ public class FishingHookLogic {
                 }
 
                 ItemEntity itementity;
-                if (cap.lava) {
+                if (cap.event.isLavaFishing()) {
                     itementity = new ItemEntity(level, hook.getX(), hook.getY(), hook.getZ(), reward) {
                         public boolean displayFireAnimation() {
                             return false;
@@ -213,7 +230,7 @@ public class FishingHookLogic {
                 itementity.setDeltaMovement(dx * scale, dy * scale + Math.sqrt(Math.sqrt(dx * dx + dy * dy + dz * dz)) * 0.08, dz * scale);
                 level.addFreshEntity(itementity);
 
-                int exp = (int) ((player.getRandom().nextInt(6) + 1) * SFConfig.getMultiplier(accuracy, player));
+                int exp = (int) ((player.getRandom().nextInt(6) + 1) * SFConfig.getMultiplier(accuracy, player, cap.event.getExpMultiplier()));
                 level.addFreshEntity(new ExperienceOrb(level, player.getX(), player.getY() + 0.5, player.getZ() + 0.5, exp));
 
                 InteractionHand hand = getRodHand(player);
@@ -258,13 +275,6 @@ public class FishingHookLogic {
         if (offHand) return InteractionHand.OFF_HAND;
 
         return null;
-    }
-
-    public static boolean hasBobber(@Nullable ItemStack fishingRod, Supplier<Item> itemSupplier) {
-        if (fishingRod == null) {
-            return false;
-        }
-        return ItemUtils.getBobber(fishingRod).is(itemSupplier.get());
     }
 
     public static Optional<ItemStack> damageBobber(ItemStack bobber, ServerPlayer player) {

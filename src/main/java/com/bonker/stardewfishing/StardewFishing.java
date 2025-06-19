@@ -38,6 +38,9 @@ public class StardewFishing {
 
     public static String MOD_NAME;
 
+    public static final Style GREEN = Style.EMPTY.withColor(0xb4ce99);
+    public static final Style RED = Style.EMPTY.withColor(0xca7d6c);
+    public static final Style LIGHTER_COLOR = Style.EMPTY.withColor(0xcca06d);
     public static final Style LIGHT_COLOR = Style.EMPTY.withColor(0xaf7a3e);
     public static final Style DARK_COLOR = Style.EMPTY.withColor(0x7e582c);
 

@@ -39,11 +39,15 @@ public record C2SCompleteMinigamePacket(boolean success, double accuracy, boolea
         contextSupplier.get().enqueueWork(() -> {
             InteractionHand hand = FishingHookLogic.getRodHand(player);
             if (hand == null) {
-                FishingHookLogic.endMinigame(player, false, 0, gotChest, null);
+                FishingHookLogic.endMinigame(player, false, 0, gotChest, 0, null);
                 StardewFishing.LOGGER.warn("{} tried to complete a fishing minigame without a fishing rod", player.getScoreboardName());
             } else {
                 ItemStack fishingRod = player.getItemInHand(hand);
-                FishingHookLogic.endMinigame(player, success, accuracy, gotChest, fishingRod);
+
+                int[] qualityBoost = {0};
+                hook.getCapability(FishingHookLogic.CapProvider.CAP).ifPresent(cap -> qualityBoost[0] = cap.event.getQualityBoost());
+
+                FishingHookLogic.endMinigame(player, success, accuracy, gotChest, qualityBoost[0], fishingRod);
                 fishingRod.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
 
                 ItemUtils.damageBobber(fishingRod, player);
