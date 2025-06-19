@@ -78,7 +78,7 @@ public class SFConfig {
     }
 
     public static double getMultiplier(double accuracy, Player player, double expMultiplierStat) {
-        double multiplier = switch(getQuality(accuracy)) {
+        double multiplier = switch (getQuality(accuracy)) {
             case 3 -> QUALITY_3_MULTIPLIER.get();
             case 2 -> QUALITY_2_MULTIPLIER.get();
             case 1 -> QUALITY_1_MULTIPLIER.get();

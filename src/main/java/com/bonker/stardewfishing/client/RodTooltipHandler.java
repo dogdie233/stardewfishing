@@ -1,5 +1,6 @@
 package com.bonker.stardewfishing.client;
 
+import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.util.Animation;
 import com.bonker.stardewfishing.client.util.RenderUtil;
@@ -19,11 +20,15 @@ import java.util.Map;
 
 public class RodTooltipHandler {
     private static final ResourceLocation TEXTURE = StardewFishing.resource("textures/gui/tooltip.png");
-
     private static final Multimap<Slot, Tooltip> MAP = HashMultimap.create();
+    private static int soundTimer = 0;
 
     public static void tick(Slot hovered, ItemStack carried) {
-        if (hovered != null && !MAP.containsKey(hovered)) {
+        if (soundTimer > 0) {
+            soundTimer--;
+        }
+
+        if (SFConfig.isInventoryEquippingEnabled() && hovered != null && !MAP.containsKey(hovered)) {
             ItemStack stack = hovered.getItem();
             if (ItemUtils.isFishingRod(stack)) {
                 MAP.put(hovered, new Tooltip(hovered));
@@ -82,7 +87,10 @@ public class RodTooltipHandler {
                 showMouse = showMouse && ItemUtils.isBobber(carried);
 
                 if (!hoveredLastTick) {
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SFSoundEvents.DWOP.get(), 1.0F));
+                    if (soundTimer == 0) {
+                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SFSoundEvents.DWOP.get(), 1.0F));
+                        soundTimer = 4;
+                    }
                     hoveredLastTick = true;
                 }
             } else {
@@ -93,7 +101,9 @@ public class RodTooltipHandler {
                 }
 
                 if (hoveredLastTick) {
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SFSoundEvents.DWOP_REVERSE.get(), 1.0F));
+                    if (soundTimer == 0) {
+                        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SFSoundEvents.DWOP_REVERSE.get(), 1.0F));
+                    }
                     hoveredLastTick = false;
                 }
             }
@@ -137,7 +147,6 @@ public class RodTooltipHandler {
             guiGraphics.pose().scale(anim, anim, 1);
 
             RenderUtil.blitF(guiGraphics, TEXTURE, x - 35, y - 12, 0, 0, 29, 27);
-            guiGraphics.pose().translate(0, 0, -150);
             RenderUtil.renderItemF(guiGraphics, ItemUtils.getBobber(stack), x - 30, y - 8);
 
             guiGraphics.pose().popPose();

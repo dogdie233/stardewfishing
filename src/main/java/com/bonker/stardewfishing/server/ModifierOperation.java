@@ -5,18 +5,11 @@ import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 
-public class ModifierOperation {
+public record ModifierOperation(Type type, double value) {
     public static final ModifierOperation DEFAULT = new ModifierOperation(Type.ADDITION, 0);
     public static final Codec<ModifierOperation> CODEC = Codec.STRING.xmap(ModifierOperation::parse, ModifierOperation::toString);
     private static final String DEFAULT_NAME = "default";
     private static final DecimalFormat FORMAT = new DecimalFormat("#.##");
-    public final Type type;
-    public final double value;
-
-    public ModifierOperation(Type type, double value) {
-        this.type = type;
-        this.value = value;
-    }
 
     public double apply(double num) {
         return type.apply(num, value);
@@ -44,16 +37,20 @@ public class ModifierOperation {
         } else if ((!matters() && other.matters()) || type != other.type) {
             return other;
         } else {
-            return switch(type) {
+            return switch (type) {
                 case ADDITION, SUBTRACTION -> new ModifierOperation(type, value + other.value);
                 case MULTIPLICATION -> new ModifierOperation(type, value * other.value);
             };
         }
     }
 
+    public String toString(double scale) {
+        return this == DEFAULT ? DEFAULT_NAME : type.identifier + FORMAT.format(value * scale);
+    }
+
     @Override
     public String toString() {
-        return this == DEFAULT ? DEFAULT_NAME : type.identifier + FORMAT.format(value);
+        return toString(1);
     }
 
     @Override
@@ -76,12 +73,12 @@ public class ModifierOperation {
         char firstChar = str.charAt(0);
 
         if (Character.isDigit(firstChar)) {
-            throw new ModifierOperationException("Found invalid string: '" + str + "'. Operations must be prefixed by a valid operation ('+', '-', 'x', or '=').");
+            throw new ModifierOperationException("Found invalid string: '" + str + "'. Operations must be prefixed by a valid operation ('+', '-', or 'x').");
         }
 
         Type type = Type.fromChar(firstChar);
         if (type == null) {
-            throw new ModifierOperationException("Found invalid string: '" + str + "'. Unknown operation '" + firstChar + "', valid operations are '+', '-', 'x', and '='.");
+            throw new ModifierOperationException("Found invalid string: '" + str + "'. Unknown operation '" + firstChar + "', valid operations are '+', '-', and 'x'.");
         }
 
         double value;

@@ -4,13 +4,17 @@ import com.bonker.stardewfishing.StardewFishing;
 import com.li64.tide.data.rods.CustomRodManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ItemUtils {
     public static ItemStack getBobber(ItemStack fishingRod) {
@@ -44,9 +48,9 @@ public class ItemUtils {
     }
 
     public static void setBobber(ItemStack fishingRod, ItemStack bobber) {
-        if (StardewFishing.AQUACULTURE_INSTALLED) {
+        if (StardewFishing.AQUACULTURE_INSTALLED && AquacultureProxy.isAquaRod(fishingRod)) {
             AquacultureProxy.setBobber(fishingRod, bobber);
-        } else if (StardewFishing.TIDE_INSTALLED) {
+        } else if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideRod(fishingRod)) {
             TideProxy.setBobber(fishingRod, bobber);
         } else {
             setBobberNBT(fishingRod, bobber);
@@ -116,6 +120,14 @@ public class ItemUtils {
                 modifiers.add(bobber);
             }
             return modifiers;
+        }
+    }
+
+    public static int getLuck(FishingHook hook) {
+        if (StardewFishing.TIDE_INSTALLED && TideProxy.isTideHookEntity(hook)) {
+            return TideProxy.getLuck(hook);
+        } else {
+            return hook.luck;
         }
     }
 }

@@ -2,6 +2,7 @@ package com.bonker.stardewfishing.server.event;
 
 import com.bonker.stardewfishing.common.FishBehavior;
 import com.bonker.stardewfishing.common.init.SFAttributes;
+import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.server.AttributeCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -41,8 +42,8 @@ public class StardewMinigameStartedEvent extends StardewMinigameEvent {
         this.expMultiplier = AttributeCache.getAttribute(player, SFAttributes.EXPERIENCE_MULTIPLIER.get());
         this.lavaFishing = lavaFishing;
 
-        // according to the minecraft wiki, each level of luck of the sea grants a 2.1% higher chance of treasure
-        float luckBonus = EnchantmentHelper.getFishingLuckBonus(fishingRod) * 0.021F;
+        // according to the minecraft wiki, each level of luck grants a 2.1% higher chance of treasure
+        float luckBonus = ItemUtils.getLuck(hook) * 0.021F;
         this.treasureChanceBonus += luckBonus;
     }
 

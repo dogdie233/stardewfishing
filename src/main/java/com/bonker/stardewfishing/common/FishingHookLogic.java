@@ -111,6 +111,7 @@ public class FishingHookLogic {
             cap.event = startEvent;
 
             double chestChance = SFConfig.getTreasureChestChance() + startEvent.getTreasureChanceBonus();
+            System.out.println(chestChance);
             if (startEvent.isForcedTreasureChest() || player.getRandom().nextFloat() < chestChance) {
                 cap.treasureChest = true;
                 if (startEvent.isForcedGoldenChest() || player.getRandom().nextFloat() < SFConfig.getGoldenChestChance()) {

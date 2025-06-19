@@ -44,7 +44,9 @@ public class StardewFishing {
     public static final Style LIGHT_COLOR = Style.EMPTY.withColor(0xaf7a3e);
     public static final Style DARK_COLOR = Style.EMPTY.withColor(0x7e582c);
 
-    public StardewFishing(FMLJavaModLoadingContext context) {
+    public StardewFishing() {
+        FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
+
         IEventBus bus = context.getModEventBus();
 
         IModInfo info = context.getContainer().getModInfo();

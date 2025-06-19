@@ -32,29 +32,30 @@
     },
     "tide:iron_fishing_bobber": {
       "exp_multiplier": "x1.05",
-      "idle_time": "+2"
+      "idle_time": "+4"
     },
     "tide:golden_fishing_bobber": {
       "exp_multiplier": "x1.15",
-      "idle_time": "+4"
+      "idle_time": "+8"
     },
     "tide:diamond_fishing_bobber": {
       "exp_multiplier": "x1.3",
-      "idle_time": "+6"
+      "idle_time": "+12"
     },
     "tide:netherite_fishing_bobber": {
       "exp_multiplier": "x1.5",
-      "idle_time": "+8"
+      "idle_time": "+16"
     },
     "tide:amethyst_fishing_bobber": {
       "top_speed": "x1.5",
-      "exp_multiplier": "x1.3"
+      "exp_multiplier": "x1.6"
     },
     "tide:echo_fishing_bobber": {
       "top_speed": "x2",
-      "exp_multiplier": "x1.7"
+      "exp_multiplier": "x2.2"
     },
     "tide:chorus_fishing_bobber": {
+      "top_speed": "x1.5",
       "up_acceleration": "x2",
       "down_acceleration": "x2",
       "exp_multiplier": "x1.6"

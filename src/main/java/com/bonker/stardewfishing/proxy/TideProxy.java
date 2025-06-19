@@ -69,4 +69,16 @@ public class TideProxy {
         }
         return modifiers;
     }
+
+    public static boolean isTideHookEntity(FishingHook hook) {
+        return hook instanceof HookAccessor;
+    }
+
+    public static int getLuck(FishingHook hook) {
+        if (hook instanceof HookAccessor accessor) {
+            Player owner = accessor.getPlayerOwner();
+            return owner == null ? 0 : HookAccessor.getHook(owner).getLuck();
+        }
+        return 0;
+    }
 }

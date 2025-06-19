@@ -7,13 +7,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import org.antlr.v4.misc.OrderedHashMap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class MinigameModifiers {
     private static final Component PIXELS = Component.translatable("tooltip.stardew_fishing.modifier.pixels");
@@ -31,7 +26,7 @@ public final class MinigameModifiers {
             throw new RuntimeException("Minigame modifiers does not cover all types: " + Arrays.toString(operations));
         }
 
-        modifierMap = new OrderedHashMap<>();
+        modifierMap = new TreeMap<>();
         for (int i = 0; i < operations.length; i++) {
             modifierMap.put(Type.values()[i], operations[i]);
         }
@@ -84,9 +79,9 @@ public final class MinigameModifiers {
                 } else {
                     key = "tooltip.stardew_fishing.modifier." + type;
                 }
-                
-                MutableComponent operationComponent = Component.literal(operation.toString());
-                if (operation.type != ModifierOperation.Type.MULTIPLICATION) {
+
+                MutableComponent operationComponent = Component.literal(type == Type.IDLE_TIME ? operation.toString(1.0 / 20) : operation.toString());
+                if (operation.type() != ModifierOperation.Type.MULTIPLICATION) {
                     operationComponent = operationComponent.append(type.getUnits());
                 }
                 boolean good = operation.isPositive() == type.higherIsBetter();

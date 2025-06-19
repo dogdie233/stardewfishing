@@ -79,7 +79,7 @@ public class CommonEvents {
 
                     if (bobber.isEmpty()) {
                         event.getToolTip().add(Component.translatable("tooltip.stardew_fishing." + (SFConfig.isInventoryEquippingEnabled() ? "no_bobber" : "no_bobber_attach_disabled"))
-                                .withStyle(StardewFishing.DARK_COLOR));
+                                .withStyle(StardewFishing.LIGHT_COLOR));
                     } else {
                         event.getToolTip().add(Component.translatable("tooltip.stardew_fishing.bobber", bobber.getDisplayName().copy().withStyle(StardewFishing.LIGHT_COLOR))
                                 .withStyle(StardewFishing.DARK_COLOR));
