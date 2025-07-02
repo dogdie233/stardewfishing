@@ -35,7 +35,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -79,6 +78,11 @@ public class FishingHookLogic {
         if (player.fishing == null || player instanceof FakePlayer) return false;
 
         return player.fishing.getCapability(CapProvider.CAP).resolve().map(cap -> {
+            // A minigame is already in progress
+            if (cap.event != null) {
+                return false;
+            }
+
             ItemStack fish = cap.rewards.stream()
                     .filter(stack -> stack.is(StardewFishing.STARTS_MINIGAME))
                     .findFirst()
@@ -111,7 +115,6 @@ public class FishingHookLogic {
             cap.event = startEvent;
 
             double chestChance = SFConfig.getTreasureChestChance() + startEvent.getTreasureChanceBonus();
-            System.out.println(chestChance);
             if (startEvent.isForcedTreasureChest() || player.getRandom().nextFloat() < chestChance) {
                 cap.treasureChest = true;
                 if (startEvent.isForcedGoldenChest() || player.getRandom().nextFloat() < SFConfig.getGoldenChestChance()) {
