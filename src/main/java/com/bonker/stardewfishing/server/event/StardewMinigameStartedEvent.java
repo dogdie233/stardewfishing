@@ -7,7 +7,6 @@ import com.bonker.stardewfishing.server.AttributeCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class StardewMinigameStartedEvent extends StardewMinigameEvent {
     private final ItemStack fish;

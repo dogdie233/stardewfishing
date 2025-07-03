@@ -8,6 +8,7 @@ import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.proxy.QualityFoodProxy;
 import com.bonker.stardewfishing.server.AttributeCache;
+import com.bonker.stardewfishing.server.LockableList;
 import com.bonker.stardewfishing.server.data.FishBehaviorReloadListener;
 import com.bonker.stardewfishing.server.data.MinigameModifiersReloadListener;
 import com.bonker.stardewfishing.server.event.StardewMinigameEndedEvent;
@@ -59,7 +60,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class FishingHookLogic {
-    public final ArrayList<ItemStack> rewards = new ArrayList<>();
+    // Lockable list because I don't want to have to tell the Tide dev to make more changes
+    public final LockableList<ItemStack> rewards = new LockableList<>();
     private boolean treasureChest = false;
     private boolean goldenChest = false;
     public StardewMinigameStartedEvent event = null;
@@ -80,8 +82,11 @@ public class FishingHookLogic {
         return player.fishing.getCapability(CapProvider.CAP).resolve().map(cap -> {
             // A minigame is already in progress
             if (cap.event != null) {
-                return false;
+                StardewFishing.LOGGER.warn("{} tried to start a minigame while playing one", player.getScoreboardName());
+                return true;
             }
+
+            cap.rewards.lock();
 
             ItemStack fish = cap.rewards.stream()
                     .filter(stack -> stack.is(StardewFishing.STARTS_MINIGAME))
@@ -191,6 +196,8 @@ public class FishingHookLogic {
         FishingHook hook = player.fishing;
 
         hook.getCapability(CapProvider.CAP).ifPresent(cap -> {
+            cap.rewards.unlock();
+
             if (cap.treasureChest && gotChest) {
                 cap.rewards.addAll(getTreasureChestLoot(player.serverLevel(), cap.goldenChest));
             }

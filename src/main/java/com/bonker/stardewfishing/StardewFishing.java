@@ -58,8 +58,6 @@ public class StardewFishing {
         SFItems.ITEMS.register(bus);
         SFItems.CREATIVE_MODE_TABS.register(bus);
 
-        SFNetworking.register();
-
         context.registerConfig(ModConfig.Type.SERVER, SFConfig.SERVER_SPEC);
     }
     

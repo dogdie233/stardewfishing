@@ -4,6 +4,7 @@ import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.RodTooltipHandler;
 import com.bonker.stardewfishing.common.init.SFAttributes;
+import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.ClientProxy;
 import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.server.data.FishBehaviorReloadListener;
@@ -24,6 +25,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class CommonEvents {
@@ -117,6 +119,11 @@ public class CommonEvents {
 
     @Mod.EventBusSubscriber(modid = StardewFishing.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModBus {
+        @SubscribeEvent
+        public static void onCommonSetup(final FMLCommonSetupEvent event) {
+            SFNetworking.register();
+        }
+
         @SubscribeEvent
         public static void onAttributeCreation(final EntityAttributeModificationEvent event) {
             event.add(EntityType.PLAYER, SFAttributes.LINE_STRENGTH.get());
