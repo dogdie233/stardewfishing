@@ -195,8 +195,8 @@ public class FishingMinigame {
     }
 
     private int pickNextTargetPos(int oldPos, Random random) {
-        int shortestDistance = packet.avgDistance() - packet.moveVariation();
-        int longestDistance = packet.avgDistance() + packet.moveVariation();
+        int shortestDistance = Math.max(10, packet.avgDistance() - packet.moveVariation());
+        int longestDistance = Math.min(MAX_FISH_HEIGHT, packet.avgDistance() + packet.moveVariation());
 
         int downLowerLimit = oldPos - shortestDistance;
         int upLowerLimit = oldPos + shortestDistance;
