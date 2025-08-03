@@ -1,5 +1,6 @@
 package com.bonker.stardewfishing.client;
 
+import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.util.Animation;
 import com.bonker.stardewfishing.client.util.RenderUtil;
@@ -8,6 +9,7 @@ import com.bonker.stardewfishing.common.init.SFSoundEvents;
 import com.bonker.stardewfishing.common.networking.C2SCompleteMinigamePacket;
 import com.bonker.stardewfishing.common.networking.S2CStartMinigamePacket;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
+import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -139,9 +141,17 @@ public class FishingScreen extends Screen {
                 }
 
                 RenderUtil.drawWithShake(poseStack, shake, partialTick, minigame.isBobberOnFish() && status == Status.MINIGAME, () -> {
+                    float pos = fishPos.getInterpolated(partialTick);
+                    int offset = 0;
+                    if (ItemUtils.isLegendaryFish(fish)) {
+                        offset += 15;
+                        if (SFConfig.isLegendaryFlashingEnabled() && (int) (pos / 8) % 2 == 1) {
+                            offset += 15;
+                        }
+                    }
                     // draw fish
-                    float fishY = 4 - 16 + (142 - fishPos.getInterpolated(partialTick));
-                    RenderUtil.blitF(pGuiGraphics, texture, leftPos + 14, topPos + fishY, 55, 0, 16, 15);
+                    float fishY = 4 - 16 + (142 - pos);
+                    RenderUtil.blitF(pGuiGraphics, texture, leftPos + 14, topPos + fishY, 55, offset, 16, 15);
                 });
 
                 if (minigame.isChestVisible() || animationTimer < 0) {
@@ -366,13 +376,13 @@ public class FishingScreen extends Screen {
         animationTimer = 20;
         textSize.reset(0.0F);
 
-        progressBar.freeze();
-        bobberPos.freeze();
-        bobberAlpha.freeze();
-        fishPos.freeze();
-        handleRot.freeze();
-        chestProgress.freeze();
-        chestAppear.freeze();
+        progressBar.freeze(partialTick);
+        bobberPos.freeze(partialTick);
+        bobberAlpha.freeze(partialTick);
+        fishPos.freeze(partialTick);
+        handleRot.freeze(partialTick);
+        chestProgress.freeze(partialTick);
+        chestAppear.freeze(partialTick);
 
         playSound(success ? SFSoundEvents.COMPLETE.get() : SFSoundEvents.FISH_ESCAPE.get());
         stopReelingSounds();

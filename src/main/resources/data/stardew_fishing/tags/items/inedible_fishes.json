@@ -1,5 +1,6 @@
 {
   "values": [
+    "#stardew_fishing:legendary_fish",
     {
       "id": "aquaculture:jellyfish",
       "required": false

@@ -6,6 +6,18 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 40,
+          "functions": [
+            {
+              "function": "minecraft:enchant_with_levels",
+              "levels": 30.0,
+              "treasure": true
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:experience_bottle",
           "weight": 20,
           "functions": [

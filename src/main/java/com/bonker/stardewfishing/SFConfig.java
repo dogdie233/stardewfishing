@@ -21,6 +21,8 @@ public class SFConfig {
     private static final ForgeConfigSpec.DoubleValue TREASURE_CHEST_CHANCE;
     private static final ForgeConfigSpec.DoubleValue GOLDEN_CHEST_CHANCE;
     private static final ForgeConfigSpec.BooleanValue INVENTORY_BOBBER_EQUIPPING;
+    private static final ForgeConfigSpec.BooleanValue LEGENDARY_FISH_FLASHING;
+    private static final ForgeConfigSpec.DoubleValue LEGENDARY_FISH_CHANCE;
 
     static {
         QUALITY_1_THRESHOLD = BUILDER
@@ -62,6 +64,14 @@ public class SFConfig {
         INVENTORY_BOBBER_EQUIPPING = BUILDER
                 .comment("Whether it be possible to attach bobber items by hovering over a fishing rod in an inventory and right clicking.")
                 .define("inventoryBobberEquipping", true);
+
+        LEGENDARY_FISH_FLASHING = BUILDER
+                .comment("Whether legendary fish will have a strobe effect when moving in the minigame.")
+                .define("legendaryFishFlashing", true);
+
+        LEGENDARY_FISH_CHANCE = BUILDER
+                .comment("The chance that any fish that bites is a legendary fish.")
+                .defineInRange("legendaryFishChance", 0.01, 0, 1);
 
         SERVER_SPEC = BUILDER.build();
     }
@@ -105,5 +115,13 @@ public class SFConfig {
 
     public static boolean isInventoryEquippingEnabled() {
         return INVENTORY_BOBBER_EQUIPPING.get();
+    }
+
+    public static boolean isLegendaryFlashingEnabled() {
+        return LEGENDARY_FISH_FLASHING.get();
+    }
+
+    public static float getLegendaryFishChance(float luck) {
+        return (float) (LEGENDARY_FISH_CHANCE.get() + luck * 0.01F);
     }
 }

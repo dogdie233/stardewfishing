@@ -3,24 +3,30 @@ package com.bonker.stardewfishing.common;
 import com.bonker.stardewfishing.SFConfig;
 import com.bonker.stardewfishing.StardewFishing;
 import com.bonker.stardewfishing.client.RodTooltipHandler;
+import com.bonker.stardewfishing.client.SparkleParticle;
 import com.bonker.stardewfishing.common.init.SFAttributes;
+import com.bonker.stardewfishing.common.init.SFItems;
+import com.bonker.stardewfishing.common.init.SFParticles;
 import com.bonker.stardewfishing.common.networking.SFNetworking;
 import com.bonker.stardewfishing.proxy.ClientProxy;
 import com.bonker.stardewfishing.proxy.ItemUtils;
 import com.bonker.stardewfishing.server.data.FishBehaviorReloadListener;
 import com.bonker.stardewfishing.server.data.MinigameModifiersReloadListener;
 import com.bonker.stardewfishing.server.SFCommands;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ItemStackedOnOtherEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,6 +37,15 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class CommonEvents {
     @Mod.EventBusSubscriber(modid = StardewFishing.MODID)
     public static class ForgeBus {
+        @SubscribeEvent(priority = EventPriority.LOWEST)
+        public static void onFishCaught(final ItemFishedEvent event) {
+            event.getDrops().forEach(stack -> {
+                if (ItemUtils.isLegendaryFish(stack)) {
+                    ItemUtils.recordLegendaryCatch(stack, event.getEntity());
+                }
+            });
+        }
+
         @SubscribeEvent
         public static void onRegisterCommands(final RegisterCommandsEvent event) {
             SFCommands.register(event.getDispatcher(), event.getBuildContext());
@@ -73,8 +88,16 @@ public class CommonEvents {
             }
         }
 
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public static void onTooltipHighPriority(final ItemTooltipEvent event) {
+            if (ItemUtils.isLegendaryFish(event.getItemStack())) {
+                event.getToolTip().add(1, SFItems.LEGENDARY_FISH_TOOLTIP.copy().withStyle(ChatFormatting.BOLD));
+                ItemUtils.addCatchTooltip(event.getItemStack(), event.getToolTip());
+            }
+        }
+
         @SubscribeEvent(priority = EventPriority.LOWEST)
-        public static void onTooltip(final ItemTooltipEvent event) {
+        public static void onTooltipLowPriority(final ItemTooltipEvent event) {
             if (ItemUtils.isFishingRod(event.getItemStack())) {
                 if (!StardewFishing.TIDE_INSTALLED) {
                     ItemStack bobber = ItemUtils.getBobber(event.getItemStack());
@@ -122,6 +145,11 @@ public class CommonEvents {
         @SubscribeEvent
         public static void onCommonSetup(final FMLCommonSetupEvent event) {
             SFNetworking.register();
+        }
+
+        @SubscribeEvent
+        public static void onParticleRegistration(final RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(SFParticles.SPARKLE.get(), SparkleParticle.Provider::new);
         }
 
         @SubscribeEvent

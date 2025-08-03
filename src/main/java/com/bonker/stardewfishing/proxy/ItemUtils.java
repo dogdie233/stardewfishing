@@ -1,20 +1,19 @@
 package com.bonker.stardewfishing.proxy;
 
 import com.bonker.stardewfishing.StardewFishing;
-import com.li64.tide.data.rods.CustomRodManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class ItemUtils {
     public static ItemStack getBobber(ItemStack fishingRod) {
@@ -128,6 +127,34 @@ public class ItemUtils {
             return TideProxy.getLuck(hook);
         } else {
             return hook.luck;
+        }
+    }
+
+    public static boolean isLegendaryFish(ItemStack stack) {
+        return stack.is(StardewFishing.LEGENDARY_FISH);
+    }
+
+    public static void recordLegendaryCatch(ItemStack stack, Player player) {
+        CompoundTag nbt = stack.getOrCreateTag();
+        CompoundTag object = new CompoundTag();
+        object.putString("player", player.getScoreboardName());
+        object.putLong("time", new Date().getTime());
+        nbt.put("legendary_catch", object);
+    }
+
+    public static void addCatchTooltip(ItemStack stack, List<Component> tooltip) {
+        if (!stack.hasTag()) {
+            return;
+        }
+        CompoundTag nbt = stack.getOrCreateTag();
+        if (nbt.contains("legendary_catch")) {
+            CompoundTag object = nbt.getCompound("legendary_catch");
+
+            String player = object.getString("player");
+            String time = DateFormat.getDateTimeInstance().format(new Date(object.getLong("time")));
+            tooltip.add(Component.empty());
+            tooltip.add(Component.translatable("tooltip.stardew_fishing.legendary_data", player, time)
+                    .withStyle(StardewFishing.LIGHTER_COLOR));
         }
     }
 }

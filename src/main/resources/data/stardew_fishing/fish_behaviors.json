@@ -332,9 +332,88 @@
       "down_acceleration": 0.8,
       "avg_distance": 50,
       "move_variation": 35
+    },
+
+    "stardew_fishing:goliath_grouper": {
+      "idle_time": 7,
+      "top_speed": 3,
+      "up_acceleration": 0.3,
+      "down_acceleration": 0.3,
+      "avg_distance": 60,
+      "move_variation": 30
+    },
+    "stardew_fishing:vampire_payara": {
+      "idle_time": 12,
+      "top_speed": 3,
+      "up_acceleration": 0.7,
+      "down_acceleration": 0.7,
+      "avg_distance": 60,
+      "move_variation": 50
+    },
+    "stardew_fishing:golden_snook": {
+      "idle_time": 8,
+      "top_speed": 3,
+      "up_acceleration": 0.8,
+      "down_acceleration": 0.8,
+      "avg_distance": 40,
+      "move_variation": 20
+    },
+    "stardew_fishing:sabretoothed_tigerfish": {
+      "idle_time": 5,
+      "top_speed": 3,
+      "up_acceleration": 0.6,
+      "down_acceleration": 0.6,
+      "avg_distance": 60,
+      "move_variation": 20
+    },
+    "stardew_fishing:chromatic_arapaima": {
+      "idle_time": 15,
+      "top_speed": 5,
+      "up_acceleration": 0.7,
+      "down_acceleration": 0.7,
+      "avg_distance": 55,
+      "move_variation": 7
+    },
+    "stardew_fishing:cyclops_mahimahi": {
+      "idle_time": 7,
+      "top_speed": 4,
+      "up_acceleration": 1.5,
+      "down_acceleration": 0.4,
+      "avg_distance": 90,
+      "move_variation": 30
+    },
+    "stardew_fishing:storm_tarpon": {
+      "idle_time": 7,
+      "top_speed": 6,
+      "up_acceleration": 0.4,
+      "down_acceleration": 1.5,
+      "avg_distance": 90,
+      "move_variation": 30
+    },
+    "stardew_fishing:blazing_oarfish": {
+      "idle_time": 1,
+      "top_speed": 2.5,
+      "up_acceleration": 0.9,
+      "down_acceleration": 0.9,
+      "avg_distance": 50,
+      "move_variation": 10
+    },
+    "stardew_fishing:crystalline_snakehead": {
+      "idle_time": 3,
+      "top_speed": 2.5,
+      "up_acceleration": 1.3,
+      "down_acceleration": 1.3,
+      "avg_distance": 70,
+      "move_variation": 60
+    },
+    "stardew_fishing:demon_gar": {
+      "idle_time": 1,
+      "top_speed": 2,
+      "up_acceleration": 1,
+      "down_acceleration": 1,
+      "avg_distance": 15,
+      "move_variation": 10
     }
-
-
     
   },
   "defaultBehavior": {

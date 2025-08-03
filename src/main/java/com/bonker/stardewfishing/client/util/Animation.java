@@ -30,9 +30,9 @@ public class Animation {
         return Mth.lerp(partialTick, lastValue, value);
     }
 
-    public void freeze() {
+    public void freeze(float partialTick) {
+        reset(getInterpolated(partialTick));
         frozen = true;
-        lastValue = value;
     }
 
     public void reset(float value) {
