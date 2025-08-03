@@ -51,7 +51,6 @@ public class LegendaryFishModifier implements IGlobalLootModifier {
             return generatedLoot;
         }
 
-        System.out.println(context.getLuck());
         if (context.getRandom().nextFloat() >= SFConfig.getLegendaryFishChance(context.getLuck())) {
             // didn't get lucky
             return generatedLoot;
