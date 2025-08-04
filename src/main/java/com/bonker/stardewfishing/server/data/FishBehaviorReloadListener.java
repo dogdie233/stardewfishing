@@ -64,13 +64,13 @@ public class FishBehaviorReloadListener extends SimplePreparableReloadListener<M
     protected void apply(Map<String, JsonObject> jsonObjects, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         for (Map.Entry<String, JsonObject> entry : jsonObjects.entrySet()) {
             FishBehaviorList.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.warn(makeError(entry.getKey(), errorMsg)))
+                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.error(makeError(entry.getKey(), errorMsg)))
                     .ifPresent(behaviorList -> {
                         behaviorList.behaviors.forEach((loc, fishBehavior) -> {
                             Item item = ForgeRegistries.ITEMS.getValue(loc);
                             if (item == Items.AIR) {
                                 if (ModList.get().isLoaded(loc.getNamespace())) {
-                                    throw new RuntimeException(makeError(entry.getKey(), "Mod '" + loc.getNamespace() + "' present but item not registered: " + loc.getPath()));
+                                    StardewFishing.LOGGER.error(makeError(entry.getKey(), "Mod '" + loc.getNamespace() + "' present but item not registered: " + loc.getPath()));
                                 }
                             } else {
                                 if (behaviorList.replace || !fishBehaviors.containsKey(item)) {

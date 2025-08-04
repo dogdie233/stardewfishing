@@ -50,12 +50,12 @@ public class MinigameModifiersReloadListener extends SimplePreparableReloadListe
     protected void apply(Map<String, JsonObject> jsonObjects, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         for (Map.Entry<String, JsonObject> entry : jsonObjects.entrySet()) {
             ModifiersList.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.warn("Failed to decode minigame modifiers list {} in data pack {} - {}", LOCATION, entry.getKey(), errorMsg))
+                    .resultOrPartial(errorMsg -> StardewFishing.LOGGER.error(makeError(entry.getKey(), errorMsg)))
                     .ifPresent(behaviorList -> behaviorList.modifiers.forEach((loc, minigameModifiers) -> {
                         Item item = ForgeRegistries.ITEMS.getValue(loc);
                         if (item == Items.AIR) {
                             if (ModList.get().isLoaded(loc.getNamespace())) {
-                                throw new RuntimeException("Mod '" + loc.getNamespace() + "' present but item not registered: " + loc.getPath());
+                                StardewFishing.LOGGER.error(makeError(entry.getKey(), "Mod '" + loc.getNamespace() + "' present but item not registered: " + loc.getPath()));
                             }
                         } else {
                             if (behaviorList.replace || !modifiers.containsKey(item)) {
@@ -66,6 +66,10 @@ public class MinigameModifiersReloadListener extends SimplePreparableReloadListe
                         }
                     }));
         }
+    }
+
+    private static String makeError(String datapackID, String description) {
+        return "Failed to decode minigame modifier list " + LOCATION + " in data pack " + datapackID + " - " + description;
     }
 
     public static MinigameModifiersReloadListener create() {
