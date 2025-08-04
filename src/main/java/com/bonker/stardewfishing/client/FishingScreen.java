@@ -205,7 +205,7 @@ public class FishingScreen extends Screen {
         }
 
         if (status != Status.HIT_TEXT) {
-            pGuiGraphics.drawString(font, StardewFishing.MOD_NAME, 2, height - 2 - font.lineHeight, 0x6969697F);
+            pGuiGraphics.drawString(font, StardewFishing.MOD_NAME, 2, height - 2 - font.lineHeight, 0x6969697F, false);
         }
     }
 
