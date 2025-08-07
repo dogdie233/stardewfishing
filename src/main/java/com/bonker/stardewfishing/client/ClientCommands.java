@@ -10,7 +10,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+/**
+ * Handles client-side commands for the Stardew Fishing mod.
+ * 
+ * Currently provides the '/stardewfishing skip-game <on/off>' command that allows
+ * players to skip the fishing minigame and automatically receive perfect results.
+ */
 public class ClientCommands {
+    
+    /**
+     * Registers client-side commands when the client starts up.
+     * This is called by the Forge event system.
+     */
     @SubscribeEvent
     public static void registerClientCommands(RegisterClientCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
@@ -26,6 +37,12 @@ public class ClientCommands {
                                 .executes(ClientCommands::setSkipGame))));
     }
 
+    /**
+     * Handles the skip-game command execution.
+     * 
+     * @param context Command context containing the argument
+     * @return 1 for success, 0 for failure (Brigadier standard)
+     */
     private static int setSkipGame(CommandContext<CommandSourceStack> context) {
         String state = StringArgumentType.getString(context, "state");
         
