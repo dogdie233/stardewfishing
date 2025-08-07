@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ContainerScreenEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.sound.PlaySoundSourceEvent;
@@ -82,6 +83,11 @@ public class ClientEvents {
             } catch (Exception e) {
                 StardewFishing.LOGGER.error("An exception occurred while trying to replace a sound event. I think this happens when you try to use a fishing rod in extremely laggy conditions.", e);
             }
+        }
+
+        @SubscribeEvent
+        public static void onRegisterClientCommands(final RegisterClientCommandsEvent event) {
+            ClientCommands.registerClientCommands(event);
         }
     }
 
